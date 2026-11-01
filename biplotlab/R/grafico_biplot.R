@@ -3,22 +3,6 @@
 # Lo usan el HJ-Biplot, el Clúster y los módulos que devuelvan filas y columnas.
 # =============================================================================
 
-# Paleta categórica por defecto (orden fijo). El usuario puede cambiar cada color.
-PALETA_GRUPOS <- c("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300",
-                   "#4a3aa7", "#e34948", "#7a5c3e", "#0e7490", "#9d174d", "#4d7c0f")
-FORMAS_GRUPOS <- c(16, 17, 15, 18, 3, 4, 8, 1, 2, 0, 5, 6)
-COLOR_FILAS   <- "#2a78d6"
-COLOR_VECTOR  <- "#9a3412"
-COLOR_TINTA   <- "#1f1f1d"
-COLOR_SUAVE   <- "#a8a7a1"
-
-#' Colores por defecto para los niveles de un grupo
-#' @param niveles niveles del grupo.
-#' @export
-colores_por_defecto <- function(niveles) {
-  stats::setNames(rep_len(PALETA_GRUPOS, length(niveles)), niveles)
-}
-
 #' Gráfico de un biplot
 #'
 #' @param res objeto devuelto por [hj_biplot()].
@@ -122,12 +106,10 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
   }
 
   inr <- res$inercia
-  lab_eje <- function(k) sprintf("Eje %d (%s %%)", k,
-                                 format(round(inr[k, 4], 2), decimal.mark = ","))
+  lab_eje <- function(k) titulo_eje_sello(k, inr[k, 4])
 
   p <- ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, colour = "#d9d8d3", linewidth = 0.4) +
-    ggplot2::geom_vline(xintercept = 0, colour = "#d9d8d3", linewidth = 0.4)
+    ejes_cero()
 
   visibles_f <- if (mal_representados == "ocultar") df_f[df_f$ok, , drop = FALSE] else df_f
   visibles_c <- if (mal_representados == "ocultar") df_c[df_c$ok, , drop = FALSE] else df_c
@@ -140,7 +122,7 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
       sel <- destacados[df_f$ok] %in% TRUE
       if (resto == "atenuar" && !all(sel)) {
         p <- p + ggplot2::geom_point(data = buenas[!sel, , drop = FALSE], ggplot2::aes(.data$x, .data$y),
-                                     colour = "#d6d5cf", size = tam_puntos * 0.8)
+                                     colour = COLOR_ATENUADO, size = tam_puntos * 0.8)
       }
       buenas <- buenas[sel, , drop = FALSE]
       malas <- malas[destacados[!df_f$ok] %in% TRUE, , drop = FALSE]
@@ -161,7 +143,7 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
     }
     if (nrow(malas) && mal_representados == "atenuar") {
       p <- p + ggplot2::geom_point(data = malas, ggplot2::aes(.data$x, .data$y),
-                                   colour = "#d6d5cf", size = tam_puntos * 0.8)
+                                   colour = COLOR_ATENUADO, size = tam_puntos * 0.8)
     }
     if (hay_grupos) {
       p <- p +
@@ -175,22 +157,20 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
                                    colour = color_filas, size = tam_puntos)
     }
     if (etiquetas_filas && nrow(buenas)) {
-      p <- p + ggrepel::geom_text_repel(
-        data = buenas, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
-        size = tam_texto * 0.9, colour = "#52514e", max.overlaps = 25,
-        segment.colour = "#c9c8c2", segment.size = 0.3, seed = 1)
+      p <- p + etiqueta_punto(buenas, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
+                              size = tam_texto * 0.9)
     }
   }
 
   # --- Columnas (variables) ---------------------------------------------------------
   if (mostrar != "filas") {
-    flecha <- grid::arrow(length = grid::unit(0.16, "cm"), type = "closed")
+    flecha <- flecha_sello()
     malas_c <- df_c[!df_c$ok, , drop = FALSE]
     buenas_c <- df_c[df_c$ok, , drop = FALSE]
     if (nrow(malas_c) && mal_representados == "atenuar") {
       p <- p + ggplot2::geom_segment(
         data = malas_c, ggplot2::aes(x = 0, y = 0, xend = .data$x, yend = .data$y),
-        colour = "#d6d5cf", linewidth = 0.5, arrow = flecha, linetype = "22")
+        colour = COLOR_ATENUADO, linewidth = 0.5, arrow = flecha, linetype = "22")
     }
     if (nrow(buenas_c)) {
       p <- p + ggplot2::geom_segment(
@@ -202,11 +182,8 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
       col_txt <- ifelse(etiq_c$ok,
                         ifelse(etiq_c$color == color_vectores, COLOR_TINTA, etiq_c$color),
                         COLOR_SUAVE)
-      p <- p + ggrepel::geom_text_repel(
-        data = etiq_c, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
-        colour = col_txt, fontface = "bold",
-        size = tam_texto, max.overlaps = Inf, min.segment.length = Inf,
-        nudge_x = 0.04 * etiq_c$x, nudge_y = 0.04 * etiq_c$y, seed = 2)
+      p <- p + etiqueta_vector(etiq_c, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
+                               size = tam_texto, colour = col_txt)
     }
   }
 
@@ -229,16 +206,7 @@ grafico_biplot <- function(res, ejes = c(1, 2), grupos = NULL,
     ggplot2::coord_equal(xlim = lim$x, ylim = lim$y, expand = FALSE) +
     ggplot2::labs(x = lab_eje(ejes[1]), y = lab_eje(ejes[2]), title = titulo,
                   subtitle = subt) +
-    ggplot2::theme_minimal(base_size = 12) +
-    ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.grid.major = ggplot2::element_line(colour = "#efeee9", linewidth = 0.3),
-      plot.subtitle = ggplot2::element_text(colour = "#6b6a65", size = 10),
-      axis.title = ggplot2::element_text(colour = "#52514e", size = 10.5),
-      axis.text = ggplot2::element_text(colour = "#8a8984", size = 9),
-      legend.position = "bottom",
-      plot.background = ggplot2::element_rect(fill = "white", colour = NA)
-    )
+    tema_sello()
   attr(p, "aspecto") <- diff(lim$y) / diff(lim$x)
   p
 }

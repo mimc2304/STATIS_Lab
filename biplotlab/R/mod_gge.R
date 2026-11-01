@@ -591,12 +591,10 @@ mod_gge_server <- function(id, datos, compartido = NULL) {
       ggplot2::ggplot(inr, ggplot2::aes(factor(.data$Eje), .data$`% Inercia`)) +
         ggplot2::geom_col(fill = COLOR_FILAS, width = 0.6) +
         ggplot2::geom_text(ggplot2::aes(label = format(round(.data$`% Inercia`, 1), decimal.mark = marca_decimal())),
-                           vjust = -0.4, size = 3.2, colour = "#52514e") +
+                           vjust = -0.4, size = 3.2, colour = COLOR_TEXTO) +
         ggplot2::labs(x = traducir("Eje"), y = traducir("% de inercia")) +
         ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.12))) +
-        ggplot2::theme_minimal(base_size = 11) +
-        ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank())
+        tema_sello()
     }, res = 96)
 
     nota <- function(cual) {
@@ -858,9 +856,5 @@ gge_grafico_herramienta <- function(res, herramienta, ejes = c(1, 2), ambiente =
   centrado <- names(GGE_OPCIONES_CENTRADO)[GGE_OPCIONES_CENTRADO == (res$centrado %||% "tester")]
   subtitulo <- paste0("GGE-Biplot - ", centrado, " - SVP ", res$particion,
                       if (identical(res$escalado, "std")) " - escalado por desviación estándar")
-  grafico +
-    ggplot2::labs(title = titulo, subtitle = subtitulo) +
-    ggplot2::theme(plot.title = ggplot2::element_text(size = 12, face = "bold"),
-                   plot.subtitle = ggplot2::element_text(colour = "#6b6a65", size = 10),
-                   plot.background = ggplot2::element_rect(fill = "white", colour = NA))
+  grafico + ggplot2::labs(title = titulo, subtitle = subtitulo)
 }

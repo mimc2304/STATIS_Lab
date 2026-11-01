@@ -144,11 +144,11 @@ mod_canonico_opciones_ui <- function(id) {
       shiny::radioButtons(ns("flecha_escala"), "Escala de las flechas",
                           c("Automática" = "auto", "Original" = "orig"), inline = TRUE),
       shiny::sliderInput(ns("flecha_mult"), "Multiplicador de longitud", 0.1, 3, 1, 0.05),
-      colourpicker::colourInput(ns("flecha_color"), "Color de las flechas", "#333333"),
+      colourpicker::colourInput(ns("flecha_color"), "Color de las flechas", COLOR_VECTOR),
       shiny::checkboxInput(ns("colores_por_var"), "Un color por variable", FALSE),
       shiny::uiOutput(ns("colores_var_ui")),
       shiny::sliderInput(ns("flecha_grosor"), "Grosor", 0.2, 3, 0.7, 0.1),
-      shiny::sliderInput(ns("flecha_punta"), "Tamaño de la punta (cm)", 0, 0.6, 0.2, 0.02),
+      shiny::sliderInput(ns("flecha_punta"), "Tamaño de la punta (cm)", 0, 0.6, 0.16, 0.02),
       abierta = FALSE
     ),
     seccion_opciones(

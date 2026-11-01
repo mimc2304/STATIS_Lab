@@ -734,8 +734,7 @@ autoplot.bigarx_canonical <- function(object, axes = c(1, 2), individuals = TRUE
   cd <- .regions_df(x, axes, grupo = med$grupo)
   inr <- x$inertia[axes, ]
   g <- ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, linetype = 3, colour = "grey60") +
-    ggplot2::geom_vline(xintercept = 0, linetype = 3, colour = "grey60")
+    ejes_cero()
   if (individuals) {
     g <- g + ggplot2::geom_point(data = ind, ggplot2::aes(x = .data$x, y = .data$y,
                                                           colour = .data$grupo),

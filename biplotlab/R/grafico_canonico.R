@@ -10,12 +10,13 @@
 #  Autores: Kleber Garzon y Roxana Barrezueta. Licencia GPL (>= 3).
 # =============================================================================
 
-paletas_disponibles <- c("Dark 3", "Set 2", "Okabe-Ito", "Viridis", "Zissou 1", "Grises")
+paletas_disponibles <- c("BiplotLab", "Dark 3", "Set 2", "Okabe-Ito", "Viridis", "Zissou 1", "Grises")
 
 #' @noRd
 #' @export
-colores_paleta <- function(n, paleta = "Dark 3") {
+colores_paleta <- function(n, paleta = "BiplotLab") {
   switch(paleta,
+    "BiplotLab" = rep_len(PALETA_GRUPOS, n),
     "Okabe-Ito" = rep_len(c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
                             "#D55E00", "#CC79A7", "#000000"), n),
     "Grises" = grDevices::gray.colors(n, start = 0.15, end = 0.7),
@@ -28,7 +29,7 @@ colores_paleta <- function(n, paleta = "Dark 3") {
 formas <- c("Círculo" = 16, "Triángulo" = 17, "Cuadrado" = 15, "Rombo" = 18,
             "Círculo vacío" = 1, "Triángulo vacío" = 2, "Cuadrado vacío" = 0, "Cruz" = 4)
 
-temas <- c("Minimalista" = "minimal", "Clásico" = "classic", "Blanco y negro" = "bw",
+temas <- c("BiplotLab" = "sello", "Minimalista" = "minimal", "Clásico" = "classic", "Blanco y negro" = "bw",
            "Claro" = "light", "Gris" = "gray", "Oscuro" = "dark", "Vacío" = "void")
 
 # Opciones por defecto: cualquier opcion puede sobrescribirse.
@@ -42,16 +43,16 @@ opciones_grafico <- function(cb, ...) {
     grupos = grupos, variables = vars, min_calidad = 0,
     ver_individuos = TRUE, ver_medias = TRUE, ver_regiones = TRUE, ver_flechas = TRUE,
     etiq_medias = TRUE, etiq_variables = TRUE, etiq_individuos = FALSE,
-    paleta = "Dark 3", colores = NULL,
+    paleta = "BiplotLab", colores = NULL,
     ind_tam = 1.6, ind_alfa = 0.45, ind_forma = 16, ind_forma_por_grupo = FALSE,
     media_tam = 4, media_forma = 15,
     reg_grosor = 0.9, reg_linea = "solid", reg_relleno = FALSE, reg_alfa = 0.12,
-    flecha_color = "#333333", flecha_colores = NULL, flecha_grosor = 0.7, flecha_punta = 0.2,
+    flecha_color = COLOR_VECTOR, flecha_colores = NULL, flecha_grosor = 0.6, flecha_punta = 0.16,
     flecha_escala = "auto", flecha_mult = 1,
     etiq_var_tam = 3.4, etiq_var_color = NULL, etiq_media_tam = 4, etiq_ind_tam = 2.4,
     evitar_solape = TRUE,
     titulo = "Biplot canónico", subtitulo = "", xlab = "", ylab = "", pie = "",
-    tema = "minimal", tam_base = 13, fuente = "sans", leyenda = "bottom", titulo_leyenda = "Grupo",
+    tema = "sello", tam_base = 12, fuente = "sans", leyenda = "bottom", titulo_leyenda = "Grupo",
     lineas_cero = TRUE, cuadricula = FALSE, fondo = "#FFFFFF",
     xlim = c(NA, NA), ylim = c(NA, NA),
     boot_medias = TRUE, boot_variables = TRUE, boot_nubes = FALSE, boot_color = "#C2410C"
@@ -96,8 +97,7 @@ grafico_canonico <- function(cb, o = opciones_grafico(cb), boot = NULL) {
 
   g <- ggplot2::ggplot()
   if (o$lineas_cero) {
-    g <- g + ggplot2::geom_hline(yintercept = 0, linetype = 3, colour = "grey55") +
-      ggplot2::geom_vline(xintercept = 0, linetype = 3, colour = "grey55")
+    g <- g + ejes_cero()
   }
   # Individuos
   if (o$ver_individuos && nrow(ind)) {
@@ -194,7 +194,7 @@ grafico_canonico <- function(cb, o = opciones_grafico(cb), boot = NULL) {
     var$color <- fc
     g <- g + ggplot2::geom_segment(data = var, ggplot2::aes(x = 0, y = 0, xend = .data$x, yend = .data$y),
                                    colour = var$color, linewidth = o$flecha_grosor,
-                                   arrow = ggplot2::arrow(length = ggplot2::unit(o$flecha_punta, "cm")))
+                                   arrow = ggplot2::arrow(length = ggplot2::unit(o$flecha_punta, "cm"), type = "closed"))
     if (o$etiq_variables) {
       lab <- var
       lab$x <- lab$x * 1.08; lab$y <- lab$y * 1.08
@@ -212,8 +212,8 @@ grafico_canonico <- function(cb, o = opciones_grafico(cb), boot = NULL) {
   if (diff(lim$y) <= 0) lim$y <- range(pts$y)
 
   inr <- cb$inertia[ax, ]
-  xl <- if (nzchar(o$xlab)) o$xlab else sprintf("Eje %d (%s%%)", ax[1], formatC(inr$inercia[1], format = "f", digits = 1))
-  yl <- if (nzchar(o$ylab)) o$ylab else sprintf("Eje %d (%s%%)", ax[2], formatC(inr$inercia[2], format = "f", digits = 1))
+  xl <- if (nzchar(o$xlab)) o$xlab else titulo_eje_sello(ax[1], inr$inercia[1])
+  yl <- if (nzchar(o$ylab)) o$ylab else titulo_eje_sello(ax[2], inr$inercia[2])
   g <- g +
     ggplot2::scale_colour_manual(values = cols_grupo, name = o$titulo_leyenda, drop = TRUE) +
     ggplot2::scale_fill_manual(values = cols_grupo, guide = "none") +
@@ -231,11 +231,13 @@ grafico_canonico <- function(cb, o = opciones_grafico(cb), boot = NULL) {
   tema_fun <- switch(o$tema, classic = ggplot2::theme_classic, bw = ggplot2::theme_bw,
                      light = ggplot2::theme_light, gray = ggplot2::theme_gray,
                      dark = ggplot2::theme_dark, void = ggplot2::theme_void, ggplot2::theme_minimal)
-  g <- g + tema_fun(base_size = o$tam_base, base_family = o$fuente) +
+  g <- g + (if (identical(o$tema, "sello")) tema_sello(o$tam_base)
+            else tema_fun(base_size = o$tam_base, base_family = o$fuente)) +
     ggplot2::theme(legend.position = o$leyenda,
                    plot.title = ggplot2::element_text(face = "bold"),
                    plot.background = ggplot2::element_rect(fill = o$fondo, colour = NA))
   if (!o$cuadricula) g <- g + ggplot2::theme(panel.grid = ggplot2::element_blank())
+  else g <- g + ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "#efeee9", linewidth = 0.3))
   g
 }
 

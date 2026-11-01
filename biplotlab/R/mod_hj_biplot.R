@@ -510,12 +510,10 @@ mod_hj_server <- function(id, datos, compartido = NULL) {
       ggplot2::ggplot(inr, ggplot2::aes(factor(.data$Eje), .data$`% Inercia`)) +
         ggplot2::geom_col(fill = COLOR_FILAS, width = 0.6) +
         ggplot2::geom_text(ggplot2::aes(label = format(round(.data$`% Inercia`, 1), decimal.mark = marca_decimal())),
-                           vjust = -0.4, size = 3.2, colour = "#52514e") +
+                           vjust = -0.4, size = 3.2, colour = COLOR_TEXTO) +
         ggplot2::labs(x = traducir("Eje"), y = traducir("% de inercia")) +
         ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.12))) +
-        ggplot2::theme_minimal(base_size = 11) +
-        ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank())
+        tema_sello()
     }, res = 96)
 
     nota <- function(cual) {

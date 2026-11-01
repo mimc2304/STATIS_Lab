@@ -239,9 +239,7 @@ mod_cluster_server <- function(id, datos, compartido = NULL) {
         ggplot2::geom_vline(xintercept = input$k, linetype = "22", colour = COLOR_VECTOR) +
         ggplot2::scale_x_continuous(breaks = e$Grupos) +
         ggplot2::labs(x = "Número de grupos", y = columna, title = titulo) +
-        ggplot2::theme_minimal(base_size = 11) +
-        ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size = 11))
+        tema_sello()
     }
     output$silueta_k <- shiny::renderPlot(traducir_grafico(grafico_k("Silueta media", "Silueta media (más alto = mejor)")), res = 96)
     output$wss_k <- shiny::renderPlot(traducir_grafico(grafico_k("SC intra", "Suma de cuadrados intra (buscar el «codo»)")), res = 96)

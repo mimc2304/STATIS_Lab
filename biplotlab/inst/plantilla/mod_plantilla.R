@@ -146,9 +146,9 @@ mod_METODO_server <- function(id, datos, compartido = NULL) {
     output$grafico <- shiny::renderPlot({
       inr <- res_ok()$inercia
       ggplot2::ggplot(inr, ggplot2::aes(factor(.data$Eje), .data$`% Inercia`)) +
-        ggplot2::geom_col(fill = "#2a78d6", width = 0.6) +
+        ggplot2::geom_col(fill = COLOR_FILAS, width = 0.6) +
         ggplot2::labs(x = "Eje", y = "% de inercia") +
-        ggplot2::theme_minimal()
+        tema_sello()
     })
 
     # TODO: tus tablas

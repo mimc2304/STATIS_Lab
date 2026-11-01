@@ -122,41 +122,35 @@ grafico_neutrosofico <- function(res, ejes = c(1, 2), calidad_min_puntos = 0, ca
   if (!is.null(grupos)) P$g <- factor(grupos)
   inercia <- res$inercia$Porcentaje
   p <- ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, colour = "#c9ced3", linewidth = 0.3) +
-    ggplot2::geom_vline(xintercept = 0, colour = "#c9ced3", linewidth = 0.3)
+    ejes_cero()
   Pv <- P[P$ver, , drop = FALSE]
   if (nrow(Pv)) {
     estetica <- if (!is.null(grupos)) ggplot2::aes(.data$x, .data$y, fill = .data$g, size = .data$I)
                 else ggplot2::aes(.data$x, .data$y, size = .data$I)
     if (!tamano_por_I) Pv$I <- 0
-    p <- p + ggplot2::geom_point(data = Pv, mapping = estetica, shape = 21, colour = "#33414a",
-                                 alpha = 0.75, fill = if (is.null(grupos)) "#4c84c4" else NULL) +
+    p <- p + ggplot2::geom_point(data = Pv, mapping = estetica, shape = 21, colour = COLOR_TEXTO,
+                                 alpha = 0.75, fill = if (is.null(grupos)) COLOR_FILAS else NULL) +
       ggplot2::scale_size_continuous(range = c(1.8, 6), limits = c(0, 1), name = "Indeterminación media",
                                      guide = if (tamano_por_I) "legend" else "none")
-    if (!is.null(grupos)) p <- p + ggplot2::scale_fill_manual(values = colores_por_defecto(nlevels(P$g)), name = NULL)
+    if (!is.null(grupos)) p <- p + ggplot2::scale_fill_manual(values = colores_por_defecto(levels(P$g)), name = NULL)
     if (etiquetas_puntos)
-      p <- p + ggrepel::geom_text_repel(data = Pv, ggplot2::aes(.data$x, .data$y, label = .data$lab),
-                                        size = 3, colour = "#33414a", max.overlaps = 25)
+      p <- p + etiqueta_punto(Pv, ggplot2::aes(.data$x, .data$y, label = .data$lab))
   }
   Vv <- V[V$ver & (V$x^2 + V$y^2) > 0, , drop = FALSE]
   if (nrow(Vv)) {
     p <- p + ggplot2::geom_segment(data = Vv, ggplot2::aes(x = 0, y = 0, xend = .data$x, yend = .data$y),
-                                   arrow = grid::arrow(length = grid::unit(0.2, "cm")),
-                                   colour = "#9c2f22", linewidth = 0.7)
+                                   arrow = flecha_sello(), colour = COLOR_VECTOR, linewidth = 0.6)
     if (etiquetas_variables)
-      p <- p + ggrepel::geom_text_repel(data = Vv, ggplot2::aes(.data$x, .data$y, label = .data$lab),
-                                        colour = "#7a1d12", fontface = "bold", size = 3.6, max.overlaps = 40)
+      p <- p + etiqueta_vector(Vv, ggplot2::aes(.data$x, .data$y, label = .data$lab))
   }
   todos <- rbind(Pv[c("x", "y")], Vv[c("x", "y")])
   lim <- limites_encuadre(todos$x, todos$y, incluir_origen = TRUE)
   p + ggplot2::coord_equal(xlim = lim$x, ylim = lim$y, expand = FALSE, clip = "off") +
-    ggplot2::labs(x = sprintf("Eje %d (%s %%)", ejes[1], format(round(inercia[ejes[1]], 2), decimal.mark = ",")),
-                  y = sprintf("Eje %d (%s %%)", ejes[2], format(round(inercia[ejes[2]], 2), decimal.mark = ",")),
+    ggplot2::labs(x = titulo_eje_sello(ejes[1], inercia[ejes[1]]),
+                  y = titulo_eje_sello(ejes[2], inercia[ejes[2]]),
                   subtitle = paste0("HJ-Biplot de puntuaciones neutrosóficas (S = T - I - F)",
                                     if (escala_vectores != 1) paste0(" - flechas × ", escala_vectores) else "")) +
-    ggplot2::theme_minimal(base_size = 12) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), legend.position = "bottom",
-                   plot.subtitle = ggplot2::element_text(colour = "#666666"))
+    tema_sello()
 }
 
 # ----------------------------------------------------------------- Opciones --

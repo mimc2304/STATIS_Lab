@@ -266,7 +266,7 @@ test_that("GGE: opciones de dibujo (nombres, negrita, resaltar, atenuar) sin cam
   g <- gge_grafico_herramienta(res, "biplot", cal_filas = 400, mal = "atenuar")
   expect_true(all(names(q) %in% etiquetas(g)))
   puntos <- capa(g, "GeomPoint")[[1]]
-  expect_equal(sum(puntos$colour == "grey80"), sum(q < 400))
+  expect_equal(sum(puntos$colour == COLOR_ATENUADO), sum(q < 400))
   # Por grupo: individuos atenuados y variables ocultas a la vez
   qc <- round(gge_resultados(res)$calidad_columnas[, "Plano"])
   g <- gge_grafico_herramienta(res, "biplot", cal_filas = 400, cal_columnas = 900,

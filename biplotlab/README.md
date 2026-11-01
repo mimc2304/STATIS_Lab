@@ -35,8 +35,8 @@ reproduce el resultado, para quien quiera usarlo directamente en R.
 > library(biplotlab)
 > ```
 >
-> No necesita Rtools (no tiene código compilado). La sintaxis del GGE-Biplot es
-> autónoma: solo usa ggplot2 y ggrepel.
+> No necesita Rtools (no tiene código compilado). Vale para todos los métodos, Biplot y
+> K-tablas: la Sintaxis R de cada uno usa las funciones de este mismo paquete.
 
 Lee esta guía completa antes de empezar: explica cómo abrir la app, qué es
 cada archivo y cómo agregar tu método.
@@ -78,6 +78,15 @@ las guías de las prácticas del módulo y con un cálculo algebraico directo, s
 Las pruebas están en `tests/testthat/test-validacion-modulo4.R`. La de fitoplancton de la
 práctica se omite si no están sus datos, que no se publican aquí. **CoSTATIS sigue a
 Thioulouse (2011):** Co-inercia de los compromisos de dos PTA.
+
+---
+
+## Sello gráfico
+
+Todos los gráficos comparten el mismo aspecto: sin cuadrícula, los mismos colores, flechas,
+etiquetas y títulos de ejes. Está en un solo archivo, `R/sello_grafico.R`: para cambiar el
+aspecto de todos los métodos basta tocar ese archivo, y ningún cálculo depende de él. Si
+agregas un método, usa sus funciones (ver `GUIA_MODULOS.md`).
 
 ---
 

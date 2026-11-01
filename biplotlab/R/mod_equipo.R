@@ -460,7 +460,7 @@ mod_equipo_server <- function(id, method, datos) {
         h <- fit()$conv
         d <- do.call(rbind, lapply(seq_along(h), function(q) data.frame(it = seq_along(h[[q]]) - 1, d = h[[q]], Eje = paste("Eje", q))))
         ggplot2::ggplot(d, ggplot2::aes(.data$it, .data$d, colour = .data$Eje)) + ggplot2::geom_line(linewidth = 0.9) +
-          ggplot2::scale_colour_manual(values = pal_groups) +
+          ggplot2::scale_colour_manual(values = PALETA_GRUPOS) +
           ggplot2::labs(x = "Iteración POCS", y = "d = u'Xv", title = "Convergencia del algoritmo POCS") + theme_biplot()
       }, res = 110)
       bic <- shiny::reactiveVal(NULL); cvres <- shiny::reactiveVal(NULL)
@@ -476,9 +476,9 @@ mod_equipo_server <- function(id, method, datos) {
       shiny::observeEvent(input$apply_bic, { b <- bic(); shiny::req(b); shiny::updateSliderInput(session, "lv", value = b$nivel[which.min(b$BIC)]) })
       shiny::observeEvent(input$apply_cv, { b <- cvres(); shiny::req(b); shiny::updateSliderInput(session, "alpha", value = min(b$alpha[which.min(b$MSE)], 0.95)) })
       grafico_seleccion <- function(b, x, y, xlab, ylab) {
-        ggplot2::ggplot(b, ggplot2::aes(.data[[x]], .data[[y]])) + ggplot2::geom_line(colour = "#1f6f8b") +
+        ggplot2::ggplot(b, ggplot2::aes(.data[[x]], .data[[y]])) + ggplot2::geom_line(colour = COLOR_FILAS) +
           ggplot2::geom_point(ggplot2::aes(colour = .data$optimo), size = 3) +
-          ggplot2::scale_colour_manual(values = c("FALSE" = "#1f6f8b", "TRUE" = "#e07a1f"), guide = "none") +
+          ggplot2::scale_colour_manual(values = c("FALSE" = COLOR_FILAS, "TRUE" = PALETA_GRUPOS[2]), guide = "none") +
           ggplot2::labs(x = xlab, y = ylab) + theme_biplot()
       }
       output$bic_plot <- dibujar(grafico_seleccion(shiny::req(bic()), "nivel", "BIC", "Nivel de sparsity (1 = sin restricción)", "BIC(τ)"), res = 110)

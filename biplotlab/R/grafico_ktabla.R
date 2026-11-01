@@ -9,24 +9,11 @@
 # (puntos), ocasiones con la paleta categórica.
 # =============================================================================
 
-COLOR_X     <- "#9a3412"
-COLOR_Y     <- "#2a78d6"
-
 colores_ocasiones <- function(niveles) stats::setNames(rep_len(PALETA_GRUPOS, length(niveles)), niveles)
 
-flecha <- function() grid::arrow(length = grid::unit(0.16, "cm"), type = "closed")
+flecha <- function() flecha_sello()
 
-tema_statislab <- function() {
-  ggplot2::theme_minimal(base_size = 12) +
-    ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.grid.major = ggplot2::element_line(colour = "#efeee9", linewidth = 0.3),
-      plot.subtitle = ggplot2::element_text(colour = "#6b6a65", size = 10),
-      axis.title = ggplot2::element_text(colour = "#52514e", size = 10.5),
-      axis.text = ggplot2::element_text(colour = "#8a8984", size = 9),
-      legend.position = "bottom",
-      plot.background = ggplot2::element_rect(fill = "white", colour = NA))
-}
+tema_statislab <- function() tema_sello()
 
 # Plano con ejes por el origen, encuadre rectangular y etiquetas de los ejes
 plano <- function(p, x, y, etiqueta_x, etiqueta_y, con_origen = TRUE, titulo = NULL,
@@ -37,11 +24,7 @@ plano <- function(p, x, y, etiqueta_x, etiqueta_y, con_origen = TRUE, titulo = N
     tema_statislab()
 }
 
-base_plano <- function() {
-  ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, colour = "#d9d8d3", linewidth = 0.4) +
-    ggplot2::geom_vline(xintercept = 0, colour = "#d9d8d3", linewidth = 0.4)
-}
+base_plano <- function() ggplot2::ggplot() + ejes_cero()
 
 comprobar_ejes <- function(m, ejes) {
   if (any(ejes > ncol(m))) stop("Solo se calcularon ", ncol(m), " ejes.", call. = FALSE)
@@ -72,8 +55,8 @@ grafico_coestructura <- function(res, ejes = c(1, 2), etiquetas = TRUE, tam_text
     otros <- df[!df$etiqueta %in% destacados, , drop = FALSE]
     if (resto == "atenuar" && nrow(otros)) {
       p <- p + ggplot2::geom_segment(data = otros, ggplot2::aes(.data$x, .data$y, xend = .data$xend, yend = .data$yend),
-                                     colour = "#e4e3de", linewidth = 0.4, arrow = flecha()) +
-        ggplot2::geom_point(data = otros, ggplot2::aes(.data$x, .data$y), colour = "#d6d5cf", size = 1.8)
+                                     colour = COLOR_ATENUADO, linewidth = 0.4, arrow = flecha()) +
+        ggplot2::geom_point(data = otros, ggplot2::aes(.data$x, .data$y), colour = COLOR_ATENUADO, size = 1.8)
     }
     df <- df[df$etiqueta %in% destacados, , drop = FALSE]
   }
@@ -86,9 +69,7 @@ grafico_coestructura <- function(res, ejes = c(1, 2), etiquetas = TRUE, tam_text
     ggplot2::scale_colour_manual(values = stats::setNames(c(COLOR_X, COLOR_Y), c(n[["X"]], n[["Y"]])),
                                  breaks = c(n[["X"]], n[["Y"]]), name = NULL)
   if (etiquetas) {
-    p <- p + ggrepel::geom_text_repel(data = df, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
-                                      size = tam_texto * 0.9, colour = "#52514e", max.overlaps = 30,
-                                      segment.colour = "#c9c8c2", segment.size = 0.3, seed = 1)
+    p <- p + etiqueta_punto(df, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta), size = tam_texto * 0.9)
   }
   plano(p, c(encuadre$x, encuadre$xend), c(encuadre$y, encuadre$yend), etiqueta_eje(res, ejes[1]), etiqueta_eje(res, ejes[2]),
         titulo = "Co-estructura de los individuos",
@@ -126,10 +107,9 @@ grafico_variables <- function(res, ejes = c(1, 2), etiquetas = TRUE, tam_texto =
     # Una sola capa de etiquetas para que no se pisen las de X con las de Y
     et <- rbind(if (verX) cbind(dX, color = COLOR_X, letra = "bold"),
                 if (verY) cbind(dY, color = COLOR_Y, letra = "plain"))
-    p <- p + ggrepel::geom_text_repel(data = et, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
-                                      colour = et$color, fontface = et$letra, size = tam_texto * 0.9,
-                                      max.overlaps = 40, segment.colour = "#c9c8c2",
-                                      segment.size = 0.3, seed = 1)
+    p <- p + etiqueta_punto(et, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta),
+                             colour = et$color, fontface = et$letra, size = tam_texto * 0.9,
+                             max.overlaps = 40)
   }
   vis <- c(if (verX) n[["X"]], if (verY) n[["Y"]])
   p <- p + ggplot2::scale_colour_manual(values = stats::setNames(c(COLOR_X, COLOR_Y), c(n[["X"]], n[["Y"]]))[vis],
@@ -155,11 +135,8 @@ grafico_interestructura <- function(inter, titulo = "Interestructura", tam_texto
     ggplot2::geom_segment(data = df, ggplot2::aes(0, 0, xend = .data$x, yend = .data$y,
                                                   colour = .data$etiqueta),
                           linewidth = 0.8, arrow = flecha(), show.legend = FALSE) +
-    ggrepel::geom_text_repel(data = df, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta,
-                                                     colour = .data$etiqueta),
-                             fontface = "bold", size = tam_texto, show.legend = FALSE,
-                             min.segment.length = Inf, nudge_x = 0.05 * df$x, nudge_y = 0.05 * df$y,
-                             seed = 2) +
+    etiqueta_vector(df, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta, colour = .data$etiqueta),
+                    size = tam_texto) +
     ggplot2::scale_colour_manual(values = colores_ocasiones(levels(df$etiqueta)))
   e <- inter$inercia[[3]]
   plano(p, df$x, df$y, paste0("Eje 1 (", pct(e[1]), ")"), paste0("Eje 2 (", pct(e[2]), ")"),
@@ -180,8 +157,8 @@ grafico_pesos <- function(inter, titulo = "Pesos del compromiso y calidad de cad
     ggplot2::geom_text(ggplot2::aes(label = formatC(.data$Valor, format = "f", digits = 2,
                                                     decimal.mark = marca_decimal())),
                        position = ggplot2::position_dodge(width = 0.7), vjust = -0.4, size = 3.2,
-                       colour = "#52514e") +
-    ggplot2::scale_fill_manual(values = c("#2a5d9f", "#b9c7d8"), name = NULL) +
+                       colour = COLOR_TEXTO) +
+    ggplot2::scale_fill_manual(values = c(COLOR_FILAS, COLOR_BARRA_SUAVE), name = NULL) +
     ggplot2::scale_y_continuous(limits = c(0, 1.08), expand = c(0, 0)) +
     ggplot2::labs(x = NULL, y = NULL, title = titulo) +
     tema_statislab()
@@ -215,7 +192,7 @@ grafico_trayectorias <- function(res, que = c("X", "Y"), tipo = c("individuos", 
   if (length(destacados)) {
     otros <- df[!as.character(df$elemento) %in% destacados, , drop = FALSE]
     if (resto == "atenuar" && nrow(otros)) {
-      p <- p + ggplot2::geom_point(data = otros, ggplot2::aes(.data$x, .data$y), colour = "#d6d5cf", size = 1.8)
+      p <- p + ggplot2::geom_point(data = otros, ggplot2::aes(.data$x, .data$y), colour = COLOR_ATENUADO, size = 1.8)
     }
     df <- df[as.character(df$elemento) %in% destacados, , drop = FALSE]
   }
@@ -227,10 +204,8 @@ grafico_trayectorias <- function(res, que = c("X", "Y"), tipo = c("individuos", 
   p <- p + ggplot2::geom_point(data = df, ggplot2::aes(.data$x, .data$y, colour = .data$Ocasión), size = 2.3) +
     ggplot2::scale_colour_manual(values = colores_ocasiones(niveles), name = NULL, drop = TRUE)
   if (etiquetas) {
-    p <- p + ggrepel::geom_text_repel(data = df, ggplot2::aes(.data$x, .data$y, label = .data$elemento,
-                                                              colour = .data$Ocasión),
-                                      size = tam_texto * 0.85, max.overlaps = 30, show.legend = FALSE,
-                                      segment.colour = "#c9c8c2", segment.size = 0.3, seed = 1)
+    p <- p + etiqueta_punto(df, ggplot2::aes(.data$x, .data$y, label = .data$elemento, colour = .data$Ocasión),
+                             size = tam_texto * 0.85)
   }
   plano(p, encuadre$x, encuadre$y, etiqueta_eje(res, ejes[1]), etiqueta_eje(res, ejes[2]),
         titulo = sprintf("Trayectorias: %s de %s", tipo, res$nombres[[que]]),
@@ -243,7 +218,7 @@ grafico_trayectorias <- function(res, que = c("X", "Y"), tipo = c("individuos", 
 grafico_test <- function(test) {
   df <- data.frame(sim = test$simulados)
   ggplot2::ggplot(df, ggplot2::aes(.data$sim)) +
-    ggplot2::geom_histogram(bins = 30, fill = "#b9c7d8", colour = "white") +
+    ggplot2::geom_histogram(bins = 30, fill = COLOR_BARRA_SUAVE, colour = "white") +
     ggplot2::geom_vline(xintercept = test$observado, colour = COLOR_X, linewidth = 1) +
     ggplot2::annotate("text", x = test$observado, y = Inf, vjust = 1.5, hjust = 1.05,
                       label = sprintf("RV observado = %s\np = %s", num(test$observado, 3), num(test$p, 3)),

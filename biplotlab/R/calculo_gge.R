@@ -192,7 +192,7 @@ gge_coordenadas_grafico <- function(datos, ejes=c(1,2)){
 
 #FUNCION 6: GRÁFICO BÁSICO
 gge_biplot_basico <- function(datos, ejes = c(1,2), ver_ambientes = NULL, ver_genotipos = NULL, flechas = TRUE,
-                              color_filas = "#2a78d6", color_columnas = "#9a3412", tam_texto = 3, tam_puntos = 1.5,
+                              color_filas = COLOR_FILAS, color_columnas = COLOR_VECTOR, tam_texto = 3, tam_puntos = 1.5,
                               nombres_filas = TRUE, nombres_columnas = TRUE,
                               color_nombres_filas = NULL, color_nombres_columnas = "black",
                               negrita = TRUE, negrita_filas = FALSE, grosor_flechas = 0.5, distancia_etiquetas = 0.25,                              resaltar_genotipos = NULL, resaltar_ambientes = NULL, color_resaltar_genotipos = "#1a9850", color_resaltar_ambientes = "#1a9850",
@@ -217,11 +217,11 @@ gge_biplot_basico <- function(datos, ejes = c(1,2), ver_ambientes = NULL, ver_ge
   
   genotipos$color <- rep(color_filas, nrow(genotipos))
   genotipos$color[genotipos$nombre %in% resaltar_genotipos] <- color_resaltar_genotipos
-  genotipos$color[genotipos$nombre %in% atenuar_genotipos] <- "grey80"
+  genotipos$color[genotipos$nombre %in% atenuar_genotipos] <- COLOR_ATENUADO
   
   ambientes$color <- rep(color_columnas, nrow(ambientes))
   ambientes$color[ambientes$nombre %in% resaltar_ambientes] <- color_resaltar_ambientes
-  ambientes$color[ambientes$nombre %in% atenuar_ambientes] <- "grey80"
+  ambientes$color[ambientes$nombre %in% atenuar_ambientes] <- COLOR_ATENUADO
   
   genotipos$color_nombre <- genotipos$color
   if (!is.null(color_nombres_filas)) genotipos$color_nombre[genotipos$color == color_filas] <- color_nombres_filas
@@ -229,13 +229,12 @@ gge_biplot_basico <- function(datos, ejes = c(1,2), ver_ambientes = NULL, ver_ge
   ambientes$color_nombre[ambientes$color == color_columnas] <- color_nombres_columnas
   
   porcentaje <- 100 * datos$valor_propio / sum(datos$valor_propio)
-  titulo_x <- paste("Eje", ejes[1], round(porcentaje[ejes[1]], 2), "%")
-  titulo_y <- paste("Eje", ejes[2], round(porcentaje[ejes[2]], 2), "%")
+  titulo_x <- titulo_eje_sello(ejes[1], porcentaje[ejes[1]])
+  titulo_y <- titulo_eje_sello(ejes[2], porcentaje[ejes[2]])
   
   
   ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, linetype = "dotted", colour = "grey60") +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dotted", colour = "grey60") +
+    ejes_cero() +
     ggplot2::geom_point(data =genotipos, ggplot2::aes(x,y, colour = color), size = tam_puntos_filas) +
     (if (nombres_filas) ggrepel::geom_text_repel(data = genotipos, ggplot2::aes(x, y, label = nombre, colour = color_nombre),
                                                  size = tam_texto_filas,
@@ -243,12 +242,12 @@ gge_biplot_basico <- function(datos, ejes = c(1,2), ver_ambientes = NULL, ver_ge
                                                  box.padding = distancia_etiquetas_filas,
                                                  seed = 1,
                                                  max.overlaps = Inf,
-                                                 segment.colour = "grey70")) +
+                                                 segment.colour = COLOR_GUIA)) +
     (if (flechas) ggplot2::geom_segment(data = ambientes,
                                         ggplot2::aes(x = 0, y = 0,
                                                      xend = x, yend = y, colour = color),
                                         linewidth = grosor_flechas,
-                                        arrow = grid::arrow(length = grid::unit(0.2, "cm")))) +
+                                        arrow = flecha_sello())) +
     (if (!flechas) ggplot2::geom_point(data =ambientes, ggplot2::aes(x,y, colour = color), size = tam_puntos_columnas))+
     (if (nombres_columnas) ggrepel::geom_text_repel(data = ambientes, ggplot2::aes(x, y, label = nombre, colour = color_nombre),
                                                     size = tam_texto_columnas,
@@ -256,12 +255,11 @@ gge_biplot_basico <- function(datos, ejes = c(1,2), ver_ambientes = NULL, ver_ge
                                                     box.padding = distancia_etiquetas_columnas,
                                                     seed = 1,
                                                     max.overlaps = Inf,
-                                                    segment.colour = "grey70")) +
+                                                    segment.colour = COLOR_GUIA)) +
     ggplot2::scale_colour_identity() +
     ggplot2::labs(x = titulo_x, y = titulo_y) +
     ggplot2::coord_equal() +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(panel.grid = ggplot2::element_blank())
+    tema_sello()
   
 }
 
@@ -296,15 +294,15 @@ gge_examinar_ambiente <- function(datos, ambiente, ejes = c(1,2), ...){
   # 6. Dibujo: biplot básico + 4 capas
   grafico <- gge_biplot_basico(datos, ejes,ver_ambientes=ambiente, ...) +
     gge_recta( e[1], e[2],                     # a) eje del ambiente
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     gge_recta(-e[2], e[1],                     # b) perpendicular
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     ggplot2::geom_segment(data = genotipos,                              # c) punteadas al pie
                           ggplot2::aes(x = x, y = y, xend = pie_x, yend = pie_y),
                           colour = "grey50", linetype = "dotted") +
     ggplot2::annotate("segment", x = 0, y = 0, xend = e[1], yend = e[2],   # d) flecha del ambiente
-                      colour = "#9a3412", linewidth = 1,
-                      arrow = grid::arrow(length = grid::unit(0.3, "cm")))
+                      colour = COLOR_VECTOR, linewidth = 1,
+                      arrow = flecha_sello())
   
   return(grafico)
 }
@@ -342,15 +340,15 @@ gge_examinar_genotipo <- function(datos, genotipo, ejes = c(1,2),flechas = FALSE
   # 6. Dibujo: biplot básico + 4 capas
   grafico <- gge_biplot_basico(datos, ejes,ver_genotipos=genotipo,flechas = FALSE, ...) +
     gge_recta( g[1], g[2],                    # a) eje del ambiente
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     gge_recta(-g[2], g[1],                     # b) perpendicular
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     ggplot2::geom_segment(data = ambientes,                              # c) punteadas al pie
                           ggplot2::aes(x = x, y = y, xend = pie_x, yend = pie_y),
                           colour = "grey50", linetype = "dotted") +
     ggplot2::annotate("segment", x = 0, y = 0, xend = g[1], yend = g[2],   # d) flecha del ambiente
-                      colour = "#9a3412", linewidth = 1,
-                      arrow = grid::arrow(length = grid::unit(0.3, "cm")))
+                      colour = COLOR_VECTOR, linewidth = 1,
+                      arrow = flecha_sello())
   
   return(grafico)
 }
@@ -537,15 +535,15 @@ gge_media_estabilidad <- function(datos, ejes = c(1,2), ...){
   
   grafico <- gge_biplot_basico(datos, ejes,flechas = FALSE, ...) +
     gge_recta( e[1], e[2],
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     gge_recta(-e[2], e[1],
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     ggplot2::geom_segment(data = genotipos,
                           ggplot2::aes(x = x, y = y, xend = pie_x, yend = pie_y),
                           colour = "grey50", linetype = "dotted") +
     ggplot2::annotate("segment", x = 0, y = 0, xend = e[1], yend = e[2],
-                      colour = "#9a3412", linewidth = 1,
-                      arrow = grid::arrow(length = grid::unit(0.3, "cm")))
+                      colour = COLOR_VECTOR, linewidth = 1,
+                      arrow = flecha_sello())
   
   return(grafico)
   
@@ -584,14 +582,14 @@ gge_ranking_ambientes <- function(datos,ejes=c(1,2), ...){
                        ggplot2::aes(x = x, y = y, group = circulo),
                        colour = "grey70") +
     ggplot2::geom_path(data = promedio_df, ggplot2::aes(x = x, y = y),                   # círculo del promedio
-                       colour = "#9a3412") +
+                       colour = COLOR_VECTOR) +
     gge_recta( promedio[1], promedio[2],       # AEA
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     gge_recta(-promedio[2], promedio[1],       # perpendicular
-                         colour = "#9a3412") +
+                         colour = COLOR_VECTOR) +
     ggplot2::annotate("segment", x = 0, y = 0, xend = ideal[1], yend = ideal[2],   # flecha al ideal
-                      colour = "#9a3412", linewidth = 1,
-                      arrow = grid::arrow(length = grid::unit(0.3, "cm")))
+                      colour = COLOR_VECTOR, linewidth = 1,
+                      arrow = flecha_sello())
   
   # 5. Encuadre como la GUI: el marco lo deciden los puntos, no los círculos
   
@@ -639,12 +637,12 @@ gge_ranking_genotipos <- function(datos,ejes=c(1,2), ...){
                        ggplot2::aes(x = x, y = y, group = circulo),
                        colour = "grey70") +
     gge_recta( promedio[1], promedio[2],       # AEA
-                         colour = "#2a78d6") +
+                         colour = COLOR_FILAS) +
     gge_recta(-promedio[2], promedio[1],       # perpendicular
-                         colour = "#2a78d6") +
+                         colour = COLOR_FILAS) +
     ggplot2::annotate("segment", x = 0, y = 0, xend = ideal[1], yend = ideal[2],   # flecha al ideal
-                      colour = "#2a78d6", linewidth = 1,
-                      arrow = grid::arrow(length = grid::unit(0.3, "cm")))
+                      colour = COLOR_FILAS, linewidth = 1,
+                      arrow = flecha_sello())
   
   
   todos <- rbind(coordenadas$genotipos[, c("x", "y")],

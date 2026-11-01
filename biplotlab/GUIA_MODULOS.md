@@ -52,7 +52,11 @@ calcular_gge <- function(datos, genotipo, ambiente, respuesta, svp = "genotype")
   llegan por `datos()$df`.
 - **Mensajes en español y claros:** usa `stop("...", call. = FALSE)`; el
   aplicativo los muestra en un recuadro.
-- **Gráficos con ggplot2** y `coord_equal()` si dibujas un biplot, para que los
+- **Gráficos con ggplot2 y con el sello del grupo:** no definas tu propio tema, tus
+  colores ni tus flechas. Usa `tema_sello()`, `ejes_cero()`, `flecha_sello()`,
+  `etiqueta_punto()`, `etiqueta_vector()`, `titulo_eje_sello()`, `PALETA_GRUPOS`,
+  `COLOR_FILAS` y `COLOR_VECTOR`, de `R/sello_grafico.R`. Una prueba automática avisa si
+  un método usa otro tema. Agrega `coord_equal()` si dibujas un biplot, para que los
   ángulos se conserven. Si tu resultado tiene `filas` y `columnas`, puedes
   reutilizar `grafico_biplot()`.
 - **Pestaña Sintaxis R:** el código que reproduce tu resultado con

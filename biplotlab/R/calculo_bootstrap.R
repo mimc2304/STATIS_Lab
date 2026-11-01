@@ -169,16 +169,14 @@ grafico_bootstrap_hist <- function(bt, estadistico) {
   v <- bt$replicas[, estadistico]
   fila <- bt$resumen[bt$resumen$Estadístico == estadistico, ]
   ggplot2::ggplot(data.frame(v = v), ggplot2::aes(.data$v)) +
-    ggplot2::geom_histogram(bins = 30, fill = "#9cc0ea", colour = "white", linewidth = 0.3) +
+    ggplot2::geom_histogram(bins = 30, fill = COLOR_BARRA_SUAVE, colour = "white", linewidth = 0.3) +
     ggplot2::geom_vline(xintercept = fila$Estimación, colour = COLOR_TINTA, linewidth = 0.7) +
     ggplot2::geom_vline(xintercept = c(fila$`LI percentil`, fila$`LS percentil`),
                         colour = COLOR_VECTOR, linetype = "22", linewidth = 0.6) +
     ggplot2::labs(x = estadistico, y = "Réplicas",
                   subtitle = sprintf("Línea continua: estimación - discontinuas: IC percentil al %s %%",
                                      format(100 * bt$nivel))) +
-    ggplot2::theme_minimal(base_size = 11) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                   plot.subtitle = ggplot2::element_text(colour = "#6b6a65", size = 9.5))
+    tema_sello()
 }
 
 #' Gráfico Q-Q normal de las réplicas de un estadístico
@@ -190,8 +188,7 @@ grafico_bootstrap_qq <- function(bt, estadistico) {
     ggplot2::stat_qq(colour = COLOR_FILAS, size = 1, alpha = 0.6) +
     ggplot2::stat_qq_line(colour = COLOR_VECTOR) +
     ggplot2::labs(x = "Cuantiles teóricos (normal)", y = "Cuantiles de las réplicas") +
-    ggplot2::theme_minimal(base_size = 11) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank())
+    tema_sello()
 }
 
 #' Biplot de variables con regiones de confianza bootstrap
@@ -216,10 +213,9 @@ grafico_bootstrap_biplot <- function(bt, colores_variables = NULL, tam_texto = 3
   col <- stats::setNames(rep(COLOR_VECTOR, length(vars)), vars)
   if (length(colores_variables)) col[names(colores_variables)] <- colores_variables
   inr <- bt$original$inercia
-  flecha <- grid::arrow(length = grid::unit(0.16, "cm"), type = "closed")
+  flecha <- flecha_sello()
   p <- ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, colour = "#d9d8d3", linewidth = 0.4) +
-    ggplot2::geom_vline(xintercept = 0, colour = "#d9d8d3", linewidth = 0.4) +
+    ejes_cero() +
     ggplot2::geom_point(data = nube, ggplot2::aes(.data$x, .data$y, colour = .data$variable),
                         size = 0.5, alpha = 0.15, show.legend = FALSE) +
     ggplot2::stat_ellipse(data = nube, ggplot2::aes(.data$x, .data$y, colour = .data$variable),
@@ -227,24 +223,17 @@ grafico_bootstrap_biplot <- function(bt, colores_variables = NULL, tam_texto = 3
     ggplot2::geom_segment(data = orig, ggplot2::aes(x = 0, y = 0, xend = .data$x, yend = .data$y,
                                                     colour = .data$variable),
                           linewidth = 0.6, arrow = flecha, show.legend = FALSE) +
-    ggrepel::geom_text_repel(data = orig, ggplot2::aes(.data$x, .data$y, label = .data$variable),
-                             colour = COLOR_TINTA, fontface = "bold", size = tam_texto,
-                             nudge_x = 0.06 * orig$x, nudge_y = 0.06 * orig$y,
-                             min.segment.length = Inf, seed = 2) +
+    etiqueta_vector(orig, ggplot2::aes(.data$x, .data$y, label = .data$variable), size = tam_texto) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::expand_limits(x = 0, y = 0) +          # el origen, de donde salen los vectores
     ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = 0.08)) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.08)) +
     ggplot2::coord_equal() +
     ggplot2::labs(
-      x = sprintf("Eje %d (%s %%)", a, format(round(inr[a, 4], 2), decimal.mark = ",")),
-      y = sprintf("Eje %d (%s %%)", b, format(round(inr[b, 4], 2), decimal.mark = ",")),
+      x = titulo_eje_sello(a, inr[a, 4]),
+      y = titulo_eje_sello(b, inr[b, 4]),
       subtitle = sprintf("Regiones de confianza al %s %% - %d réplicas",
                          format(100 * bt$nivel), bt$validas)) +
-    ggplot2::theme_minimal(base_size = 12) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                   panel.grid.major = ggplot2::element_line(colour = "#efeee9", linewidth = 0.3),
-                   plot.subtitle = ggplot2::element_text(colour = "#6b6a65", size = 10),
-                   plot.background = ggplot2::element_rect(fill = "white", colour = NA))
+    tema_sello()
   con_proporcion_minima(p)
 }
