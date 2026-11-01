@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^app\.R$
+^iniciar\.R$
+^README\.md$
+^rsconnect$
+^CLAUDE\.md$
