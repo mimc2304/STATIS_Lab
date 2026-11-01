@@ -9,7 +9,7 @@
 #' @export
 analisis_bootstrap <- function() {
   list(
-    id = "bootstrap", titulo = "Bootstrap", grupo = "Biplot", icono = "shuffle",
+    id = "bootstrap", titulo = "Bootstrap HJ", grupo = "Biplot", icono = "shuffle",
     descripcion = "Intervalos de confianza bootstrap para el HJ-Biplot",
     listo = TRUE,
     opciones_ui = mod_bootstrap_opciones_ui,
@@ -21,7 +21,7 @@ analisis_bootstrap <- function() {
 mod_bootstrap_opciones_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
-    encabezado_opciones("Bootstrap del HJ-Biplot", "Remuestreo de individuos con reemplazo"),
+    encabezado_opciones("Bootstrap HJ", "Remuestreo de individuos con reemplazo"),
     caja_dependencia_hj("Remuestrea el HJ-Biplot tal como está configurado (variables, transformación, exclusiones y plano del gráfico)."),
     seccion_opciones(
       "Remuestreo",
@@ -48,7 +48,7 @@ mod_bootstrap_opciones_ui <- function(id) {
 mod_bootstrap_resultados_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
-    encabezado_resultados("Bootstrap del HJ-Biplot", ns("subtitulo")),
+    encabezado_resultados("Bootstrap HJ", ns("subtitulo")),
     shiny::uiOutput(ns("error")),
     shiny::div(
       class = "bl-card",
@@ -237,7 +237,7 @@ mod_bootstrap_server <- function(id, datos, compartido = NULL) {
     output$excel <- shiny::downloadHandler(
       filename = function() "bootstrap_biplot.xlsx",
       content = function(file) guardar_xlsx(hojas_excel(), file))
-    registrar_informe(session, "Bootstrap", function() list(grafico()), hojas_excel)
+    registrar_informe(session, "Bootstrap HJ", function() list(grafico()), hojas_excel)
 
     bt
   })

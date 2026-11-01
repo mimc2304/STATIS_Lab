@@ -5,7 +5,7 @@
 #' @export
 analisis_statico <- function() {
   list(
-    id = "statico", titulo = "STATICO", grupo = "K-tablas", subgrupo = "K pares de tablas", icono = "layer-group",
+    id = "statico", titulo = "STATICO", grupo = "K-tablas", subgrupo = "Pares de K tablas", icono = "layer-group",
     descripcion = "STATIS de la co-estructura: parte estable de la relación X-Y a lo largo de las ocasiones",
     listo = TRUE,
     opciones_ui = mod_statico_opciones_ui,

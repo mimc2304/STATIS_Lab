@@ -29,7 +29,7 @@ registro_analisis <- function() {
     analisis_gge(),           # GGE-Biplot
 
     # K-tablas. La plantilla está en inst/plantilla/mod_plantilla_ktabla.R
-    # El orden sigue el número de tablas: dos, K y K pares. Evelyn: Co-inercia, STATICO
+    # El orden sigue el número de tablas: dos, K y pares de K. Evelyn: Co-inercia, STATICO
     # y CoSTATIS; los neutrosóficos los trabaja todo el grupo
     analisis_coinercia(),
     proximamente("coinercia_neutro", "Co-inercia Neutrosófica", "circle-half-stroke",
@@ -57,10 +57,10 @@ registro_analisis <- function() {
                  "HJ-Biplot composicional"),
     analisis_statico(),
     proximamente("statico_neutro", "STATICO Neutrosófico", "circle-half-stroke",
-                 "STATICO con datos neutrosóficos", "K-tablas", subgrupo = "K pares de tablas"),
+                 "STATICO con datos neutrosóficos", "K-tablas", subgrupo = "Pares de K tablas"),
     analisis_costatis(),
     proximamente("costatis_neutro", "CoSTATIS Neutrosófico", "circle-half-stroke",
-                 "CoSTATIS con datos neutrosóficos", "K-tablas", subgrupo = "K pares de tablas")
+                 "CoSTATIS con datos neutrosóficos", "K-tablas", subgrupo = "Pares de K tablas")
   )
 }
 

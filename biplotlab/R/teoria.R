@@ -113,7 +113,7 @@ TEORIA <- list(
 
   # --------------------------------------------------------- Bootstrap ------
   bootstrap = list(
-    titulo = "Bootstrap del HJ-Biplot",
+    titulo = "Bootstrap HJ",
     subtitulo = "Intervalos de confianza para lo que muestra el biplot (Nieto et al., 2014)",
     resumen = list(
       para_que = "Saber cuánto se puede confiar en el biplot: si la inercia, las calidades y la posición de las variables son estables o dependen de la muestra.",
@@ -155,7 +155,7 @@ TEORIA <- list(
 
   # ------------------------------------------------------------ Clúster ------
   cluster = list(
-    titulo = "Clúster sobre las coordenadas del biplot",
+    titulo = "Clúster HJ",
     subtitulo = "Agrupar individuos (o variables) con las coordenadas de los primeros ejes",
     resumen = list(
       para_que = "Formar grupos de individuos parecidos y verlos dibujados sobre el mismo biplot, con su perfil.",

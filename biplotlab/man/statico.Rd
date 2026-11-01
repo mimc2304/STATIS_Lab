@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculo_statico.R
 \name{statico}
 \alias{statico}
-\title{STATICO: STATIS sobre la co-estructura de K pares de tablas}
+\title{STATICO: STATIS sobre la co-estructura de pares de K tablas}
 \usage{
 statico(
   datos,
@@ -40,7 +40,7 @@ los nombres de fila.}
 objeto `statislab`.
 }
 \description{
-STATICO: STATIS sobre la co-estructura de K pares de tablas
+STATICO: STATIS sobre la co-estructura de pares de K tablas
 }
 \examples{
 meau <- ejemplo_statis("meau")

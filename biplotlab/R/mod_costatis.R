@@ -5,7 +5,7 @@
 #' @export
 analisis_costatis <- function() {
   list(
-    id = "costatis", titulo = "CoSTATIS", grupo = "K-tablas", subgrupo = "K pares de tablas", icono = "cubes",
+    id = "costatis", titulo = "CoSTATIS", grupo = "K-tablas", subgrupo = "Pares de K tablas", icono = "cubes",
     descripcion = "Co-inercia de los compromisos de dos K-tablas con los mismos individuos",
     listo = TRUE,
     opciones_ui = mod_costatis_opciones_ui,

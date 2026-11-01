@@ -80,7 +80,7 @@ test_that("descripciones de STATIS y un método colgado de dos pestañas", {
   expect_equal(vapply(k, `[[`, "", "id")[1:4], c("coinercia", "coinercia_neutro", "statis", "statis_dual"))
   expect_equal(lengths(por_subgrupo(k, "K-tablas")), c(2L, 8L, 4L))
   expect_equal(vapply(por_subgrupo(k, "K-tablas"), function(s) s[[1]]$subgrupo, ""),
-               c("Dos tablas", "K tablas", "K pares de tablas"))
+               c("Dos tablas", "K tablas", "Pares de K tablas"))
   # HJ Composicional: solo en Biplot, debajo de HJ Dinámico y en desarrollo
   b <- del_grupo(a, "Biplot")
   ids_b <- vapply(b, `[[`, "", "id")

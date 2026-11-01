@@ -183,8 +183,8 @@ ejemplo_biplot <- function(nombre = c("riano", "pisa", "cantones", "iris", "cesp
 # Bases de ejemplo que ofrece el panel Datos (etiqueta = nombre en ejemplo_biplot())
 EJEMPLOS_BIPLOT <- c(
   "Fitoplancton de Riaño: 70 muestras por fecha y profundidad (HJ)" = "riano",
-  "PISA 2025: 90 países (HJ, Bootstrap, Clúster)" = "pisa",
-  "Cantones del Ecuador: energía (HJ, Bootstrap, Clúster)" = "cantones",
+  "PISA 2025: 90 países (HJ, Bootstrap HJ, Clúster HJ)" = "pisa",
+  "Cantones del Ecuador: energía (HJ, Bootstrap HJ, Clúster HJ)" = "cantones",
   "Iris: 150 flores, 3 especies (Canónico, Logístico, DPCA, Disjoint, Cenet)" = "iris",
   "Césped de Seber: dos factores (Canónico / MANOVA)" = "cesped",
   "Ontario 1993: 18 genotipos × 9 ambientes (GGE)" = "ontario",
@@ -194,8 +194,8 @@ EJEMPLOS_BIPLOT <- c(
 # Mini texto de cada base: de qué va y qué probar con ella
 INFO_EJEMPLOS <- list(
   riano = "Abundancia de 13 grupos de fitoplancton en el embalse de Riaño (1991): 10 fechas (A a J) y 7 niveles de profundidad. El eje 1 recoge el 28 % y el eje 2 el 15 %: muestra la sucesión del paso de la mezcla a la estratificación. Prueba en HJ-Biplot: en «Pintar solo algunos puntos» elige Fecha o Nivel para ver una parte sin recalcular el análisis. Fuente: Galindo et al. (1999).",
-  pisa = "Indicadores de 90 países en PISA 2025, con REGION como grupo. Los dos primeros ejes recogen el 42 % y el 24 %. Prueba: HJ-Biplot coloreado por región, Bootstrap y Clúster.",
-  cantones = "218 cantones del Ecuador y 10 variables de energía. Ejes de 54 % y 40 %. Sirve para ver cómo un atípico (URBINA JADO) pesa en el gráfico: exclúyelo y compara. Prueba: HJ-Biplot, Bootstrap y Clúster.",
+  pisa = "Indicadores de 90 países en PISA 2025, con REGION como grupo. Los dos primeros ejes recogen el 42 % y el 24 %. Prueba: HJ-Biplot coloreado por región, Bootstrap HJ y Clúster HJ.",
+  cantones = "218 cantones del Ecuador y 10 variables de energía. Ejes de 54 % y 40 %. Sirve para ver cómo un atípico (URBINA JADO) pesa en el gráfico: exclúyelo y compara. Prueba: HJ-Biplot, Bootstrap HJ y Clúster HJ.",
   iris = "150 flores de 3 especies, 4 medidas. Clásico para métodos con grupos: la especie separa bien las flores. Prueba: Canónico, Logístico, DPCA, Disjoint y Cenet.",
   cesped = "Césped de Seber: 3 respuestas y 2 factores (tratamiento y temperatura). Su valor está en los dos factores, para el Canónico / MANOVA-Biplot; no se pensó para HJ-Biplot, porque el eje 1 recoge el 84 %.",
   ontario = "18 genotipos en 9 ambientes (Ontario, 1993). Muestra qué genotipo gana en cada ambiente. Prueba: GGE-Biplot.",

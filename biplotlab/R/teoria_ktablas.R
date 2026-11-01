@@ -71,7 +71,7 @@ TEORIA_KTABLAS <- list(
     subtitulo = "STATIS sobre la co-estructura de una secuencia de pares de tablas (Simier et al., 1999)",
     resumen = list(
       para_que = "Encontrar la parte estable de la relación entre dos grupos de variables (X e Y) a lo largo de varias ocasiones, y ver en qué ocasiones esa relación se cumple mejor.",
-      entrada = "Una secuencia de K pares de tablas: en cada ocasión, X e Y sobre los mismos individuos; siempre las mismas variables. Los individuos pueden cambiar de una ocasión a otra.",
+      entrada = "Pares de K tablas: en cada ocasión, X e Y sobre los mismos individuos; siempre las mismas variables. Los individuos pueden cambiar de una ocasión a otra.",
       no_usar = "Una sola ocasión (usar Co-inercia) o variables distintas en cada ocasión.",
       lectura = "Interestructura: ocasiones con flechas cercanas tienen co-estructuras parecidas. Compromiso: variables de X y de Y en la misma dirección se asocian de forma estable. Trayectorias: cómo se ubica cada individuo en cada ocasión."),
     para_que = c(

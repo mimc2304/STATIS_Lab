@@ -78,7 +78,7 @@ calcular_gge <- function(datos, genotipo, ambiente, respuesta, svp = "genotype")
 
 El servidor recibe además `compartido`: el HJ-Biplot publica ahí su resultado
 (`compartido$hj()`) y su configuración (`compartido$hj_config()`). Así lo usan
-Bootstrap y Clúster sin tocar el núcleo; tu módulo puede hacer lo mismo.
+Bootstrap HJ y Clúster HJ sin tocar el núcleo; tu módulo puede hacer lo mismo.
 
 ## Si tu método es de K-tablas
 

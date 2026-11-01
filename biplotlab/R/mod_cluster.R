@@ -10,7 +10,7 @@
 #' @export
 analisis_cluster <- function() {
   list(
-    id = "cluster", titulo = "Clúster", grupo = "Biplot", icono = "circle-nodes",
+    id = "cluster", titulo = "Clúster HJ", grupo = "Biplot", icono = "circle-nodes",
     descripcion = "Clúster jerárquico o k-medias sobre las coordenadas del HJ-Biplot",
     listo = TRUE,
     opciones_ui = mod_cluster_opciones_ui,
@@ -22,7 +22,7 @@ analisis_cluster <- function() {
 mod_cluster_opciones_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
-    encabezado_opciones("Clúster sobre coordenadas", "Clasificación sobre el biplot"),
+    encabezado_opciones("Clúster HJ", "Clasificación sobre el biplot"),
     caja_dependencia_hj("Usa el HJ-Biplot tal como está configurado (variables, transformación y exclusiones)."),
     seccion_opciones(
       "Qué se agrupa",
@@ -62,7 +62,7 @@ mod_cluster_opciones_ui <- function(id) {
 mod_cluster_resultados_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
-    encabezado_resultados("Clúster sobre coordenadas del biplot", ns("subtitulo")),
+    encabezado_resultados("Clúster HJ", ns("subtitulo")),
     shiny::uiOutput(ns("error")),
     shiny::div(
       class = "bl-card",
@@ -317,7 +317,7 @@ mod_cluster_server <- function(id, datos, compartido = NULL) {
     output$excel <- shiny::downloadHandler(
       filename = function() "cluster_biplot.xlsx",
       content = function(file) guardar_xlsx(hojas_excel(), file))
-    registrar_informe(session, "Clúster", function() list(grafico()), hojas_excel)
+    registrar_informe(session, "Clúster HJ", function() list(grafico()), hojas_excel)
 
     cl
   })

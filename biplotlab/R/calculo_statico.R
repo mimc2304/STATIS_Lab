@@ -1,7 +1,7 @@
 # =============================================================================
 # STATICO (Simier et al., 1999; Thioulouse, Simier y Chessel, 2004).
 #
-# Una secuencia de K pares de tablas (X_k, Y_k): en cada ocasión k, X_k e Y_k
+# Una secuencia de pares de K tablas (X_k, Y_k): en cada ocasión k, X_k e Y_k
 # describen a los mismos individuos; las ocasiones pueden tener individuos
 # distintos, pero siempre las mismas variables.
 #   1. Co-estructura de cada ocasión:  Z_k = X_k' D_k Y_k        (p × q)
@@ -18,7 +18,7 @@
 # Thioulouse (2011) (tests/testthat/test-statico.R).
 # =============================================================================
 
-#' STATICO: STATIS sobre la co-estructura de K pares de tablas
+#' STATICO: STATIS sobre la co-estructura de pares de K tablas
 #'
 #' @inheritParams par_ktablas
 #' @param preparacion_x,preparacion_y códigos de [PREPARACIONES_KTABLA].

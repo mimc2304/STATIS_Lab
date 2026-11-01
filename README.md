@@ -47,10 +47,10 @@ cada archivo y cómo agregar tu método.
 
 | Apartado | Disponibles | En desarrollo |
 |---|---|---|
-| **Biplot** | HJ-Biplot, Bootstrap, Clúster, Canónico / MANOVA, Logístico, DPCA, Disjoint, Cenet, HJ Neutrosófico, GGE | HJ Dinámico, HJ Composicional |
+| **Biplot** | HJ-Biplot, Bootstrap HJ, Clúster HJ, Canónico / MANOVA, Logístico, DPCA, Disjoint, Cenet, HJ Neutrosófico, GGE | HJ Dinámico, HJ Composicional |
 | **K-tablas: dos tablas** | Co-inercia | Co-inercia Neutrosófica |
 | **K-tablas: K tablas** | | STATIS, STATIS DUAL, sus versiones Neutrosóficas y Canónicas, Metabiplot, HJ Dinámico |
-| **K-tablas: K pares de tablas** | STATICO, CoSTATIS | STATICO y CoSTATIS Neutrosóficos |
+| **K-tablas: Pares de K tablas** | STATICO, CoSTATIS | STATICO y CoSTATIS Neutrosóficos |
 
 **HJ Dinámico** aparece en los dos apartados porque es a la vez un Biplot y un método de
 tres vías. Los métodos «en desarrollo» se ven en gris hasta que estén listos.
@@ -141,8 +141,8 @@ la tecla `Esc`.
    | Apartado | Base | Tamaño | Para probar |
    |---|---|---|---|
    | Biplot | Fitoplancton de Riaño | 70 muestras × 13 grupos; `Fecha`, `Nivel`, `Regimen` | HJ-Biplot; pintar por fecha o profundidad |
-   | Biplot | PISA 2025 (países) | 90 × 12, `REGION` como grupo | HJ-Biplot, Bootstrap, Clúster |
-   | Biplot | Cantones del Ecuador (energía) | 218 × 10 | HJ-Biplot, Bootstrap, Clúster (atípico URBINA JADO) |
+   | Biplot | PISA 2025 (países) | 90 × 12, `REGION` como grupo | HJ-Biplot, Bootstrap HJ, Clúster HJ |
+   | Biplot | Cantones del Ecuador (energía) | 218 × 10 | HJ-Biplot, Bootstrap HJ, Clúster HJ (atípico URBINA JADO) |
    | Biplot | Iris | 150 × 4, `Species` como grupo | Canónico, Logístico, DPCA, Disjoint, Cenet |
    | Biplot | Césped de Seber | 48 × 3, factores `tratamiento` y `temperatura` | Canónico / MANOVA-Biplot con dos factores |
    | Biplot | Ontario 1993 | 18 genotipos × 9 ambientes | GGE-Biplot |
@@ -205,8 +205,8 @@ Límites propios de la app, aparte de la memoria:
 |---|---|---|
 | Subir el archivo | 200 MB (`LIMITE_ARCHIVO_MB` en `R/app.R`) | Shiny solo acepta 5 MB si no se indica. Un CSV de 1 000 000 × 50 pesa ~ 500 MB, así que antes de llegar al límite de memoria se llega a este: usa Parquet (mucho más liviano) o sube el límite. |
 | Gráfico | Legible hasta unos pocos miles de puntos | Las etiquetas se ocultan solas cuando se superponen; con muchos puntos tarda en dibujar. |
-| Bootstrap | 5000 × 20 con 500 réplicas en unos 10 s | Repite la SVD B veces: el tiempo crece con B. |
-| Clúster | Hasta 5000 individuos (`LIMITE_CLUSTER` en `R/calculo_cluster.R`) | La matriz de distancias crece con n²: con 10 000 ocupa unos 4 GB. |
+| Bootstrap HJ | 5000 × 20 con 500 réplicas en unos 10 s | Repite la SVD B veces: el tiempo crece con B. |
+| Clúster HJ | Hasta 5000 individuos (`LIMITE_CLUSTER` en `R/calculo_cluster.R`) | La matriz de distancias crece con n²: con 10 000 ocupa unos 4 GB. |
 
 Las cifras de memoria son estimaciones; los tiempos son del HJ-Biplot.
 
@@ -248,7 +248,7 @@ Cada método está separado en **dos archivos**:
 |---|---|---|
 | **HJ-Biplot** (y GH / JK) | `calculo_hj_biplot.R` | `mod_hj_biplot.R` |
 | Bootstrap del HJ-Biplot | `calculo_bootstrap.R` | `mod_bootstrap.R` |
-| Clúster sobre coordenadas | `calculo_cluster.R` | `mod_cluster.R` |
+| Clúster HJ | `calculo_cluster.R` | `mod_cluster.R` |
 | Biplot canónico / MANOVA (uno y dos factores, bootstrap) | `calculo_canonico.R`, `grafico_canonico.R` y `tablas_canonico.R` | `mod_canonico.R` |
 | Biplot logístico, DPCA, Disjoint Biplot y CenetBiplot (app del compañero) | `equipo_logistico_externo.R`, `equipo_logistico_interno.R`, `equipo_dpca.R`, `equipo_cdpca.R`, `equipo_cenet.R`, `equipo_nucleo.R` y `equipo_graficos.R` (sin cambios) | `mod_equipo.R` |
 | HJ-Biplot neutrosófico | `neutrosofico_calculo.R` (sin cambios) | `mod_neutrosofico.R` |
