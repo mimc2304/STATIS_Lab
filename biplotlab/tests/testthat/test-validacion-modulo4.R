@@ -131,6 +131,26 @@ test_that("pintar solo algunos puntos no cambia el encuadre ni el análisis", {
   expect_equal(rango(ta), rango(tb))
 })
 
+test_that("las etiquetas dinámicas de un solo punto quedan en su sitio", {
+  b <- BLOQUES_EJEMPLO$meau
+  s <- statico(ejemplo_statis("meau"), b$x, b$y, "Estacion", "Sitio", "total", "centrar")
+  g <- grafico_dinamico(grafico_interestructura(s$interestructura$XY, "I"))
+  json <- jsonlite::fromJSON(plotly::plotly_json(g, jsonedit = FALSE), simplifyVector = FALSE)
+  etiquetas <- Filter(function(a) nzchar(a$text %||% ""), json$layout$annotations)
+  etiquetas <- Filter(function(a) a$text %in% rownames(s$interestructura$XY$coordenadas), etiquetas)
+  expect_length(etiquetas, 4)
+  for (a in etiquetas) {
+    expect_length(a$x, 1); expect_false(is.list(a$x)); expect_false(is.list(a$y))
+  }
+})
+
+test_that("una columna de la base anterior no cuenta como individuos", {
+  df <- data.frame(a = 1:2)
+  expect_null(individuo_input("Estacion", df))
+  expect_equal(individuo_input("a", df), "a")
+  expect_null(individuo_input(""))
+})
+
 test_that("el menú de ejemplos cambia con el apartado y cada base tiene su texto", {
   bi <- opciones_ejemplos("Biplot"); kt <- opciones_ejemplos("K-tablas")
   expect_true("riano" %in% bi); expect_false("riano" %in% kt)

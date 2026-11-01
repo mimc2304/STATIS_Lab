@@ -98,7 +98,9 @@ grafico_dinamico <- function(p) {
       color <- rep_len(t$textfont$color %||% "#1f1f1d", n)
       tam <- rep_len(t$textfont$size %||% 12, n)
       lapply(seq_len(n), function(k) {
-        list(x = t$x[k], y = t$y[k], xref = "x", yref = "y", text = as.character(t$text[k]),
+        # as.numeric: plotly marca con I() los trazos de un solo punto y en JSON saldrían
+        # como lista; así la anotación no se coloca y queda en la esquina del gráfico
+        list(x = as.numeric(t$x[k]), y = as.numeric(t$y[k]), xref = "x", yref = "y", text = as.character(t$text[k]),
              showarrow = FALSE, font = list(color = color[k], size = tam[k]), yshift = 9)
       })
     }), recursive = FALSE))

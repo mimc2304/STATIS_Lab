@@ -90,7 +90,10 @@ elementos_trayectorias <- function(res, input) {
 }
 
 # "" en el selector de individuos = nombres de fila
-individuo_input <- function(x) if (is.null(x) || !nzchar(x)) NULL else x
+# Una columna que ya no existe (quedó de la base anterior) también cuenta como vacía
+individuo_input <- function(x, df = NULL) {
+  if (is.null(x) || !nzchar(x) || (!is.null(df) && !x %in% names(df))) NULL else x
+}
 
 mod_statico_server <- function(id, datos, compartido = NULL) {
   shiny::moduleServer(id, function(input, output, session) {
@@ -100,9 +103,9 @@ mod_statico_server <- function(id, datos, compartido = NULL) {
     resultado <- shiny::reactive({
       if (is.null(datos())) return(simpleError("Primero carga una base de datos en el panel Datos."))
       if (length(input$var_y) < 2) return(simpleError("Elige al menos 2 variables para la tabla Y."))
-      shiny::req(input$ocasion)
+      shiny::req(input$ocasion %in% names(datos()$df))
       calcular_seguro(statico(
-        datos()$df, input$var_x, input$var_y, input$ocasion, individuo_input(input$individuo),
+        datos()$df, input$var_x, input$var_y, input$ocasion, individuo_input(input$individuo, datos()$df),
         input$prep_x, input$prep_y, ejes = input$ejes %||% 2,
         nombre_x = input$nombre_x, nombre_y = input$nombre_y))
     })

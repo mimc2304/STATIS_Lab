@@ -56,12 +56,12 @@ mod_costatis_server <- function(id, datos, compartido = NULL) {
     resultado <- shiny::reactive({
       if (is.null(datos())) return(simpleError("Primero carga una base de datos en el panel Datos."))
       if (length(input$var_y) < 2) return(simpleError("Elige al menos 2 variables para la tabla Y."))
-      shiny::req(input$ocasion)
-      if (is.null(individuo_input(input$individuo))) {
+      shiny::req(input$ocasion %in% names(datos()$df))
+      if (is.null(individuo_input(input$individuo, datos()$df))) {
         return(simpleError("CoSTATIS necesita la columna de individuos para alinear las ocasiones."))
       }
       calcular_seguro(costatis(
-        datos()$df, input$var_x, input$var_y, input$ocasion, individuo_input(input$individuo),
+        datos()$df, input$var_x, input$var_y, input$ocasion, individuo_input(input$individuo, datos()$df),
         input$prep_x, input$prep_y, ejes = input$ejes %||% 2,
         permutaciones = input$permutaciones %||% 0, semilla = input$semilla,
         nombre_x = input$nombre_x, nombre_y = input$nombre_y))
