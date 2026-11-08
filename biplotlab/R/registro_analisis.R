@@ -53,8 +53,9 @@ registro_analisis <- function() {
     # Se ve como un Biplot y como un método de tres vías: va en las dos pestañas
     proximamente("hj_dinamico", "HJ Dinámico", "chart-line",
                  "HJ-Biplot dinámico", "K-tablas", tambien_en = "Biplot", subgrupo = "K tablas"),
-    proximamente("hj_composicional", "HJ Composicional", "chart-pie",
-                 "HJ-Biplot composicional"),
+    #proximamente("hj_composicional", "HJ Composicional", "chart-pie",
+    #             "HJ-Biplot composicional"),
+    analisis_composicional(),
     analisis_statico(),
     proximamente("statico_neutro", "STATICO Neutrosófico", "circle-half-stroke",
                  "STATICO con datos neutrosóficos", "K-tablas", subgrupo = "Pares de K tablas"),

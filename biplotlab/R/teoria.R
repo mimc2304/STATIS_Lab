@@ -489,5 +489,46 @@ TEORIA <- list(
         "Gabriel, K. R. (1971). The biplot graphic display of matrices with application to principal component analysis. <i>Biometrika, 58</i>(3), 453-467. https://doi.org/10.1093/biomet/58.3.453",
         "Galindo-Villardón, M. P. (1986). Una alternativa de representación simultánea: HJ-Biplot. <i>Qüestiió, 10</i>(1), 13-23. http://hdl.handle.net/2099/4523",
         "Yan, W., Hunt, L. A., Sheng, Q. y Szlavnics, Z. (2000). Cultivar evaluation and mega-environment investigation based on the GGE biplot. <i>Crop Science, 40</i>(3), 597-605. https://doi.org/10.2135/cropsci2000.403597x",
-        "Yan, W. y Tinker, N. A. (2006). Biplot analysis of multi-environment trial data: Principles and applications. <i>Canadian Journal of Plant Science, 86</i>(3), 623-645. https://doi.org/10.4141/P05-169")))
+        "Yan, W. y Tinker, N. A. (2006). Biplot analysis of multi-environment trial data: Principles and applications. <i>Canadian Journal of Plant Science, 86</i>(3), 623-645. https://doi.org/10.4141/P05-169"))),
+  # ---------------------------------------------------------------- HJ Composicional------
+  hj_composicional = list(
+    titulo = "HJ-Biplot Composicional",
+    subtitulo = "Representación simultánea de datos composicionales con rayos y enlaces (Hernández Suárez et al., 2016)",
+    resumen = list(
+      para_que = "Analizar variables que forman partes de un todo (proporciones, concentraciones o porcentajes), evitando correlaciones espurias mediante la geometría de Aitchison y la aproximación de log-ratios con enlaces entre las partes (links).",
+      entrada = "Datos cuantitativos estrictamente positivos que representan componentes o proporciones de una muestra.",
+      no_usar = "Datos con valores negativos o variables que no formen parte de una composición.",
+      lectura = "Individuos como puntos, partes como rayos desde el centroide (origen) y enlaces (links) conectando los rayos. La longitud del enlace aproxima la variabilidad del log-ratio entre las dos partes."),
+    para_que = c(
+      "Los datos composicionales son vectores de valores positivos cuya suma es constante o representan partes de un total (concentraciones químicas, nutrientes, fracciones geológicas). Este tipo de datos forman parte de un sub-espacio (Simplex) del espacio Euclideano, por lo que al utilizar métodos basados en la matriz de covarianza se introducen <b>correlaciones espurias</b>.",
+      "El HJ-Biplot Composicional combina la geometría de Aitchison (a través de la transformación <i>centred log-ratio</i>, clr) con la descomposición HJ-Biplot de máxima calidad simétrica para filas y columnas (Hernández Suárez et al., 2016). Esto permite identificar enlaces directos (links) y variaciones lineales entre compuestos."),
+    entrada = c(
+      "Una matriz o tabla con las muestras en las filas y las partes composicionales (variables químicas, geológicas, biológicas o nutricionales) en las columnas. Los valores deben ser positivos (o tener ceros susceptibles de imputación)."),
+    no_usar = c(
+      "Variables con valores negativos o datos no relativos.",
+      "Conjuntos con alta proporción de ceros estructurales sin imputación."),
+    calculos = c(
+      "<b>1. Imputación de ceros (opcional).</b> Sustitución multiplicativa de ceros mediante una fracción (\\(\\delta = 0.65\\)) del mínimo valor positivo de cada columna, preservando las sumas relativas.",
+      "<b>2. Transformación clr (Centered Log-Ratio).</b> Para cada vector composicional \\(\\mathbf{x} = (x_1, \\dots, x_D)\\): \\[\\text{clr}(\\mathbf{x}) = \\left( \\ln\\frac{x_1}{g_m(\\mathbf{x})}, \\dots, \\ln\\frac{x_D}{g_m(\\mathbf{x})} \\right)\\] donde \\(g_m(\\mathbf{x})\\) es la media geométrica de las partes y \\( D \\)  es el número de partes",
+      "<b>3. Doble centrado de la matriz clr.</b> Cada fila de la matriz clr ya suma cero. Luego se vuelve a centrar las columnas respecto a su media muestral.",
+      "<b>4. Descomposición en valores singulares (SVD).</b> \\(\\mathbf{X}_{dc} = \\mathbf{U} \\boldsymbol{\\Sigma} \\mathbf{V}^T\\). Los marcadores HJ son \\(\\mathbf{J} = \\mathbf{U} \\boldsymbol{\\Sigma}\\) para las filas y \\(\\mathbf{H} = \\mathbf{V} \\boldsymbol{\\Sigma}\\) para las columnas.",
+      "<b>5. Matriz de Variación.</b> Triángulo superior: varianzas \\(\\text{var}(\\ln(X_i/X_j))\\); triángulo inferior: medias \\(\\text{mean}(\\ln(X_i/X_j))\\); clr-varianzas y varianza total."),
+    lectura = c(
+      "<b>Rayos</b>: La longitud de cada vector desde el centroide aproxima la desviación estándar del logaritmo de la razón entre la variable correspondiente con respecto a la media geométrica \\( \\sqrt{\\text{var} \\left( \\ln\\frac{X_i}{g_m(X)} \\right)\\} \\).",
+      "<b>Enlaces (Links)</b>: El segmento que conecta los vértices de dos rayos (links) \\(\\mathbf{h}_i\\) y \\(\\mathbf{h}_j\\) tiene una longitud proporcional a \\(\\sqrt{\\text{var}(\\ln(X_i/X_j))}\\). Enlaces cortos indican una fuerte proporcionalidad lineal entre las dos partes (comportamiento conjunto o redundante).",
+      "<b>Ángulos entre enlaces</b>: Enlaces perpendiculares señalan pares de relaciones no correlacionadas; enlaces paralelos o en la misma dirección indican covariación conjunta.",
+      "<b>Individuos</b>: Las muestras cercanas al origen presentan una composición equilibrada (similar a la media geométrica); las muestras alejadas hacia un rayo tienen concentraciones relativas superiores en esa componente."),
+    donde = c(
+      "<code>R/calculo_composicional.R</code>: transformación clr, matriz de variación, descomposición HJ y trazado de enlaces.",
+      "<code>R/mod_composicional.R</code>: interfaz de usuario, opciones interactivas, tablas y descargas.",
+      "Validado Pendiente."),
+    referencias = list(
+      modulo = c(
+        "Hernández Suárez, M., Molina Pérez, D., Rodríguez-Rodríguez, E. M., Díaz Romero, C., Espinosa Borreguero, F. y Galindo-Villardón, P. (2016). The Compositional HJ-Biplot—A new approach to identifying the links among bioactive compounds of tomatoes. <i>International Journal of Molecular Sciences, 17</i>(11), 1828. https://doi.org/10.3390/ijms17111828"),
+      original = c(
+        "Aitchison, J. (1986). <i>The Statistical Analysis of Compositional Data</i>. Chapman and Hall, London.",
+        "Aitchison, J. y Greenacre, M. (2002). Biplots for compositional data. <i>Applied Statistics, 51</i>(4), 375-382. https://doi.org/10.1111/1467-9876.00275",
+        "Galindo-Villardón, M. P. (1986). Una alternativa de representación simultánea: HJ-Biplot. <i>Qüestiió, 10</i>(1), 13-23. http://hdl.handle.net/2099/4523",
+        "Pawlowsky-Glahn, V., Egozcue, J. J. y Tolosana-Delgado, R. (2015). <i>Modeling and Analysis of Compositional Data</i>. John Wiley & Sons, Chichester.")))
+  
 )

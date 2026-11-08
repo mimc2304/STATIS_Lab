@@ -141,7 +141,7 @@ primera_columna_a_nombres <- function(datos) {
 #' @param nombre nombre de la base.
 #' @export
 ejemplo_biplot <- function(nombre = c("riano", "pisa", "cantones", "iris", "cesped", "ontario",
-                                     "victimizacion", BASES_KTABLA)) {
+                                     "victimizacion", "colores", BASES_KTABLA)) {
   nombre <- match.arg(nombre)
   if (nombre %in% BASES_KTABLA) return(ejemplo_statis(nombre))
   if (nombre == "iris") {
@@ -171,7 +171,8 @@ ejemplo_biplot <- function(nombre = c("riano", "pisa", "cantones", "iris", "cesp
   }
   archivo <- switch(nombre, riano = "fitoplancton_riano.csv",
                     pisa = "pisa2025_paises.csv", cantones = "cantones_energia.csv",
-                    cesped = "cesped_seber.csv", ontario = "ontario.csv")
+                    cesped = "cesped_seber.csv", ontario = "ontario.csv",
+                    colores = "colour_composition_paintings.csv")
   ruta <- system.file("extdata", archivo, package = "biplotlab")
   if (!nzchar(ruta)) ruta <- file.path("inst", "extdata", archivo)  # durante el desarrollo
   datos <- utils::read.csv(ruta, check.names = FALSE, stringsAsFactors = FALSE,
@@ -188,7 +189,8 @@ EJEMPLOS_BIPLOT <- c(
   "Iris: 150 flores, 3 especies (Canónico, Logístico, DPCA, Disjoint, Cenet)" = "iris",
   "Césped de Seber: dos factores (Canónico / MANOVA)" = "cesped",
   "Ontario 1993: 18 genotipos × 9 ambientes (GGE)" = "ontario",
-  "Victimización Ecuador (INEC): HJ-Biplot neutrosófico" = "victimizacion"
+  "Victimización Ecuador (INEC): HJ-Biplot neutrosófico" = "victimizacion",
+  "Composición de Colores de 22 pinturas: 22 muestras × 6 colores (HJ Composicional)" = "colores"
 )
 
 # Mini texto de cada base: de qué va y qué probar con ella
@@ -200,6 +202,7 @@ INFO_EJEMPLOS <- list(
   cesped = "Césped de Seber: 3 respuestas y 2 factores (tratamiento y temperatura). Su valor está en los dos factores, para el Canónico / MANOVA-Biplot; no se pensó para HJ-Biplot, porque el eje 1 recoge el 84 %.",
   ontario = "18 genotipos en 9 ambientes (Ontario, 1993). Muestra qué genotipo gana en cada ambiente. Prueba: GGE-Biplot.",
   victimizacion = "Encuesta de victimización del INEC (Ecuador): 117.737 personas y 3 variables. Prueba: HJ-Biplot neutrosófico.",
+  colores = "22 pinturas y 6 colores de la composición (black, white, blue, red, yellow, other). Fuente: Aitchison, J; Greenacre, M. (2002). Prueba: HJ Composicional con enlaces y matriz de variación.",
   frutas = "28 lotes de melocotones y nectarinas: 15 descriptores del fruto (X) y el orden de preferencia de 16 jueces (Y). ¿Lo que se mide del fruto explica lo que se prefiere? Tres ejes con información (60 %, 22 % y 11 %), RV = 0,49 y p = 0,001. Prueba: Co-inercia; pinta solo algunos lotes para seguir sus flechas. Fuente: Kervella (1991), en ade4.",
   meau_sitios = "Arroyo Meaudret, ambiente y efemerópteros, con los 6 sitios como ocasiones y las 4 estaciones como individuos. ¿La relación ambiente-especies se mantiene a lo largo del arroyo? Compromiso de STATICO con tres ejes útiles (47 %, 36 % y 15 %). Fuente: Thioulouse (2011), en ade4.",
   meau = "Arroyo Meaudret con las 4 estaciones como ocasiones y los 6 sitios como individuos. ¿Cómo se relacionan el ambiente estable y la fauna estable de cada sitio? En CoSTATIS los ejes recogen el 81 % y el 16 %, con RV = 0,82 y co-estructura significativa. Fuente: Thioulouse (2011), en ade4."
