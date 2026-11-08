@@ -170,7 +170,26 @@ LECTURA_EN <- c(
   "^Co-estructura más fuerte \\(flechas más cortas\\): " = "Strongest co-structure (shortest arrows): ",
   "^Co-estructura más débil \\(flechas más largas\\): " = "Weakest co-structure (longest arrows): ",
   "^Las trayectorias muestran cada ocasión proyectada sobre los ejes de co-inercia de los compromisos: una ocasión lejos del resto es un momento en que la estructura se aparta de la parte estable\\." =
-    "The trajectories show each occasion projected onto the co-inertia axes of the compromises: an occasion far from the rest is a moment when the structure departs from the stable part."
+    "The trajectories show each occasion projected onto the co-inertia axes of the compromises: an occasion far from the rest is a moment when the structure departs from the stable part.",
+  # STATIS DUAL (clásico y neutrosófico)
+  "^Interstructure of las ocasiones:" = "Interstructure of the occasions:",
+  "^Cada terna se resumió con S = (.+?) antes del análisis\\." =
+    "Each triplet was summarized as S = \\1 before the analysis.",
+  "^En estos datos F = 1 - T en todas las celdas: la falsedad no aporta información propia\\. La puntuación se reduce a (.+?); solo importa la razón entre esos dos pesos\\." =
+    "In these data F = 1 - T in every cell: falsity adds no information of its own. The score reduces to \\1; only the ratio between those two weights matters.",
+  "^I = 0 en todas las celdas: no hay indeterminación y el análisis equivale a un STATIS DUAL de wT·T - wF·F\\." =
+    "I = 0 in every cell: there is no indeterminacy and the analysis is equivalent to a dual STATIS of wT·T - wF·F.",
+  "^El plano (\\d+)-(\\d+) del compromiso recoge el (.+?) de la inercia de la estructura común entre variables\\." =
+    "Plane \\1-\\2 of the compromise accounts for \\3 of the inertia of the common structure among variables.",
+  "^Eje (\\d+): destacan (.+?)\\.$" = "Axis \\1: the most prominent are \\2.",
+  "^Variables bien representadas en el plano \\(calidad ≥ 500 ‰\\): " =
+    "Variables well represented in the plane (quality ≥ 500 ‰): ",
+  "^Variables con calidad menor que 500 ‰ en el plano \\(no interpretar sus ángulos\\): " =
+    "Variables with quality below 500 ‰ in the plane (do not interpret their angles): ",
+  "^En el círculo, dos variables bien representadas con un ángulo pequeño se relacionan en forma directa en el conjunto de las ocasiones; cerca de 180°, en forma inversa; cerca de 90°, sin relación lineal\\." =
+    "In the circle, two well-represented variables with a small angle are directly related across the occasions; near 180°, inversely; near 90°, with no linear relation.",
+  "^Frente al STATIS DUAL de T solo: correlación entre las matrices RV = (.+?), Spearman entre los pesos = (.+?) y Procrustes de las variables = (.+?)\\. Valores cercanos a 1 indican que I y F cambian poco la estructura\\." =
+    "Compared with the dual STATIS of T alone: correlation between the RV matrices = \\1, Spearman between the weights = \\2 and Procrustes of the variables = \\3. Values close to 1 indicate that I and F change the structure little."
 )
 
 # Traduce las frases de la Lectura guiada si el idioma es inglés
@@ -186,6 +205,11 @@ preparacion_informe <- function(res) {
   a <- res$llamada
   etiqueta <- function(codigo) {
     if (en) PREPARACIONES_EN[[codigo]] %||% codigo else etiqueta_preparacion(codigo)
+  }
+  if (is.null(a$preparacion_y)) {
+    # Una sola serie de tablas (STATIS DUAL): no hay tabla Y
+    return(sprintf(if (en) "Preparation of each table: %s." else "Preparación de cada tabla: %s.",
+                   etiqueta(a$preparacion_x)))
   }
   sprintf(if (en) "Table %s: %s." else "Tabla %s: %s.",
           res$nombres[c("X", "Y")], c(etiqueta(a$preparacion_x), etiqueta(a$preparacion_y)))

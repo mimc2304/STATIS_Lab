@@ -42,8 +42,7 @@ registro_analisis <- function() {
                  "K-tablas", subgrupo = "K tablas"),
     proximamente("statis_neutro", "STATIS Neutrosófico", "circle-half-stroke",
                  "STATIS con datos neutrosóficos", "K-tablas", subgrupo = "K tablas"),
-    proximamente("statis_dual_neutro", "DUAL Neutrosófico", "circle-half-stroke",
-                 "STATIS DUAL con datos neutrosóficos", "K-tablas", subgrupo = "K tablas"),
+    analisis_statis_dual_neutro(),
     proximamente("statis_canonico", "STATIS Canónico", "table-cells",
                  "STATIS canónico", "K-tablas", subgrupo = "K tablas"),    # Marlon
     proximamente("statis_dual_canonico", "DUAL Canónico", "table-columns",

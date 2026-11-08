@@ -228,3 +228,51 @@ grafico_test <- function(test) {
                   subtitle = test$hipotesis) +
     tema_statislab()
 }
+
+#' Círculo de correlaciones del compromiso (STATIS DUAL)
+#'
+#' Cada variable es una flecha con longitud total 1 en el compromiso; en el
+#' plano, su largo es la raíz de su calidad. Solo se interpretan los ángulos de
+#' las flechas que llegan cerca del círculo.
+#' @inheritParams grafico_coestructura
+#' @param titulo título del gráfico.
+#' @export
+grafico_circulo <- function(res, ejes = c(1, 2), etiquetas = TRUE, tam_texto = 3.2,
+                            titulo = "Compromiso: círculo de correlaciones") {
+  m <- res$variables$X
+  comprobar_ejes(m, ejes)
+  df <- data.frame(x = m[, ejes[1]], y = m[, ejes[2]], etiqueta = rownames(m))
+  ang <- seq(0, 2 * pi, length.out = 241)
+  circ <- data.frame(x = cos(ang), y = sin(ang))
+  p <- base_plano() +
+    ggplot2::geom_path(data = circ, ggplot2::aes(.data$x, .data$y), colour = COLOR_GUIA, linewidth = 0.4) +
+    ggplot2::geom_segment(data = df, ggplot2::aes(0, 0, xend = .data$x, yend = .data$y),
+                          colour = COLOR_VECTOR, linewidth = 0.6, arrow = flecha())
+  if (etiquetas) p <- p + etiqueta_vector(df, ggplot2::aes(.data$x, .data$y, label = .data$etiqueta), size = tam_texto)
+  plano(p, c(-1, 1, df$x), c(-1, 1, df$y), etiqueta_eje(res, ejes[1]), etiqueta_eje(res, ejes[2]),
+        titulo = titulo, subtitulo = "Flecha cerca del círculo: variable bien representada en el plano")
+}
+
+#' Indeterminación media por variable y ocasión (STATIS DUAL neutrosófico)
+#' @param res resultado de [statis_dual_neutro()].
+#' @export
+grafico_indeterminacion <- function(res) {
+  I <- res$indeterminacion
+  if (is.null(I)) stop("Este resultado no tiene indeterminación.", call. = FALSE)
+  df <- data.frame(Ocasión = factor(rep(rownames(I), ncol(I)), levels = rev(rownames(I))),
+                   Variable = factor(rep(colnames(I), each = nrow(I)), levels = colnames(I)),
+                   I = as.vector(I))
+  tope <- max(1e-9, max(df$I))
+  df$tinta <- ifelse(df$I > 0.6 * tope, "white", COLOR_TINTA)
+  decimal <- function(x) formatC(x, format = "f", digits = 2, decimal.mark = marca_decimal())
+  ggplot2::ggplot(df, ggplot2::aes(.data$Variable, .data$Ocasión, fill = .data$I)) +
+    ggplot2::geom_tile(colour = "white") +
+    ggplot2::geom_text(ggplot2::aes(label = decimal(.data$I), colour = .data$tinta), size = 3) +
+    ggplot2::scale_colour_identity() +
+    ggplot2::scale_fill_gradient(low = "white", high = COLOR_VECTOR, limits = c(0, tope), name = "I media",
+                                 breaks = pretty(c(0, tope), n = 3), labels = decimal,
+                                 guide = ggplot2::guide_colourbar(barwidth = grid::unit(5, "cm"))) +
+    ggplot2::labs(x = NULL, y = NULL, title = "Indeterminación media por variable y ocasión",
+                  subtitle = "Una celda oscura: esa variable es más incierta en esa ocasión") +
+    tema_statislab()
+}
