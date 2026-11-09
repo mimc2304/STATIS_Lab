@@ -10,6 +10,8 @@ GRAFICOS_BGL <- list(
   coinercia = c("coestructura", "variables", "test"),
   statico = c("interestructura", "pesos", "variables", "trayectorias"),
   costatis = c("interestructura", "pesos", "coestructura", "variables", "trayectorias", "test"),
+  statis = c("interestructura", "pesos", "individuos", "circulo", "trayectorias"),
+  statis_neutro = c("interestructura", "pesos", "individuos", "circulo", "trayectorias", "indeterminacion"),
   statis_dual = c("interestructura", "pesos", "circulo", "trayectorias"),
   statis_dual_neutro = c("interestructura", "pesos", "circulo", "trayectorias", "indeterminacion")
 )
@@ -19,7 +21,8 @@ GRAFICOS_BGL <- list(
 #' @param x resultado de un método K-tablas (por ejemplo, de [statico()]) o un
 #'   data.frame con los datos.
 #' @param metodo si `x` son datos, nombre de la función que los analiza:
-#'   `"coinercia"`, `"statico"`, `"costatis"`, `"statis_dual"` o `"statis_dual_neutro"`.
+#'   `"coinercia"`, `"statico"`, `"costatis"`, `"statis"`, `"statis_neutro"`,
+#'   `"statis_dual"` o `"statis_dual_neutro"`.
 #' @param ... argumentos para esa función.
 #' @return objeto de clase `BGL`.
 #' @examples
@@ -35,11 +38,14 @@ BGL_Create <- function(x, metodo = NULL, ...) {
     if (!is.data.frame(x) || is.null(metodo)) {
       stop("Indica un resultado K-tablas, o unos datos con su método.", call. = FALSE)
     }
-    metodo <- match.arg(metodo, c("coinercia", "statico", "costatis", "statis_dual", "statis_dual_neutro"))
+    metodo <- match.arg(metodo, c("coinercia", "statico", "costatis", "statis", "statis_neutro", "statis_dual",
+                                 "statis_dual_neutro"))
     res <- switch(metodo,
                   coinercia = coinercia(x, ...),
                   statico = statico(x, ...),
                   costatis = costatis(x, ...),
+                  statis = statis_directo(x, ...),
+                  statis_neutro = statis_neutro(x, ...),
                   statis_dual = statis_dual(x, ...),
                   statis_dual_neutro = statis_dual_neutro(x, ...))
   }
@@ -177,6 +183,7 @@ BGL_Plot <- function(bgl, tipo = bgl$Graphics$disponibles[1], ejes = c(1, 2), se
          pesos = grafico_pesos(inter, ...),
          trayectorias = grafico_trayectorias(res, ejes = ejes, ...),
          circulo = grafico_circulo(res, ejes, ...),
+         individuos = grafico_individuos(res, ejes, ...),
          indeterminacion = grafico_indeterminacion(res),
          test = grafico_test(res$test))
 }

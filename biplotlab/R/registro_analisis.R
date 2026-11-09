@@ -34,14 +34,9 @@ registro_analisis <- function() {
     analisis_coinercia(),
     proximamente("coinercia_neutro", "Co-inercia Neutrosófica", "circle-half-stroke",
                  "Co-inercia con datos neutrosóficos", "K-tablas", subgrupo = "Dos tablas"),
-    proximamente("statis", "STATIS", "table-cells",
-                 "Mismos individuos en todas las ocasiones (obligatorio); las variables pueden coincidir o no",
-                 "K-tablas", subgrupo = "K tablas"),                       # Isa y Evelyn
-    proximamente("statis_dual", "STATIS DUAL", "table-columns",
-                 "Mismas variables en todas las ocasiones (obligatorio); los individuos pueden coincidir o no",
-                 "K-tablas", subgrupo = "K tablas"),
-    proximamente("statis_neutro", "STATIS Neutrosófico", "circle-half-stroke",
-                 "STATIS con datos neutrosóficos", "K-tablas", subgrupo = "K tablas"),
+    analisis_statis(),                                                     # Isa y Evelyn
+    analisis_statis_dual(),
+    analisis_statis_neutro(),
     analisis_statis_dual_neutro(),
     proximamente("statis_canonico", "STATIS Canónico", "table-cells",
                  "STATIS canónico", "K-tablas", subgrupo = "K tablas"),    # Marlon

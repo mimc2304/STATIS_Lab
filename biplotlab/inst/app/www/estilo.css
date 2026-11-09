@@ -188,3 +188,12 @@ table.dataTable td, table.dataTable th { white-space: nowrap; }
 .bl-revision td { font-size: .85rem; vertical-align: top; }
 .bl-aviso { color: #9a6700; font-weight: 600; }
 .bl-problema { color: #b42318; font-weight: 600; }
+
+/* Descripción bajo cada gráfico (familia STATIS) */
+.bl-descripcion { margin: 6px 4px 18px; padding: 8px 12px; background: #f5f7fa; border-left: 3px solid var(--bl-azul);
+  border-radius: 4px; font-size: .86rem; line-height: 1.5; color: #1f2933; }
+.bl-descripcion > summary { cursor: pointer; font-weight: 600; color: var(--bl-tinta-2); }
+.bl-descripcion > summary .fa, .bl-descripcion > summary svg { color: var(--bl-azul); margin-right: 6px; }
+.bl-descripcion p { margin: 6px 0; }
+.bl-descripcion ul { margin: 4px 0 2px 18px; padding: 0; }
+.bl-descripcion li { margin-bottom: 3px; }

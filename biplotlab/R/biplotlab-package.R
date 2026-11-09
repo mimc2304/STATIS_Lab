@@ -12,7 +12,7 @@
 #'
 #' @keywords internal
 #' @importFrom ggplot2 .data
-#' @importFrom ade4 dudi.pca dudi.coa withinpca wca coinertia pta ktab.within
+#' @importFrom ade4 dudi.pca dudi.coa withinpca wca coinertia pta ktab.within ktab.list.dudi
 #'   ktab.match2ktabs randtest statis
 #' @import ggplot2
 #' @importFrom ggrepel geom_text_repel

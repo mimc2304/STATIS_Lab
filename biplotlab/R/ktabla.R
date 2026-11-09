@@ -100,12 +100,12 @@ par_ktablas <- function(datos, variables_x, variables_y, ocasion, individuo = NU
 
 # CoSTATIS hace un PTA de cada serie: la fila i de cada ocasión debe ser el
 # mismo individuo. Se comprueba y se ordena como en la primera ocasión.
-ordenar_individuos_comunes <- function(datos, ocasion, individuo) {
+ordenar_individuos_comunes <- function(datos, ocasion, individuo, metodo = "CoSTATIS", alternativa = "STATICO") {
   comprobar_columnas(datos, c(ocasion, individuo))
   occ <- as.character(datos[[ocasion]])
   ind <- if (is.null(individuo)) rownames(datos) else as.character(datos[[individuo]])
   if (is.null(individuo)) {
-    stop("Indica la columna de individuos: CoSTATIS necesita saber qué fila de cada ocasión ",
+    stop("Indica la columna de individuos: ", metodo, " necesita saber qué fila de cada ocasión ",
          "corresponde al mismo individuo.", call. = FALSE)
   }
   niveles <- unique(occ)
@@ -114,9 +114,9 @@ ordenar_individuos_comunes <- function(datos, ocasion, individuo) {
     otros <- ind[occ == k]
     if (!setequal(base, otros) || length(base) != length(otros)) {
       faltan <- union(setdiff(base, otros), setdiff(otros, base))
-      stop("CoSTATIS necesita los mismos individuos en todas las ocasiones. En «", k,
+      stop(metodo, " necesita los mismos individuos en todas las ocasiones. En «", k,
            "» no coinciden: ", paste(utils::head(faltan, 6), collapse = ", "),
-           if (length(faltan) > 6) ", ..." else "", ". Usa STATICO, que admite individuos distintos.",
+           if (length(faltan) > 6) ", ..." else "", ". Usa ", alternativa, ", que admite individuos distintos.",
            call. = FALSE)
     }
   }

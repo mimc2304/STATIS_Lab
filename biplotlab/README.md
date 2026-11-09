@@ -62,6 +62,16 @@ tres vías. Los métodos «en desarrollo» se ven en gris hasta que estén listo
 - **STATICO:** en cada ocasión, X e Y sobre los mismos individuos; siempre las mismas variables.
 - **CoSTATIS:** los mismos individuos en todas las ocasiones y las mismas variables en cada serie.
 
+### STATIS y STATIS DUAL (con sus versiones neutrosóficas)
+
+Funcionan con cualquier base en formato largo (una fila por individuo y ocasión, con una columna de ocasión). Cada gráfico lleva debajo una descripción de cómo se lee, y la pestaña **Fundamentos** trae la teoría.
+
+| Método | Datos | Gráficos |
+|---|---|---|
+| **STATIS** (`statis_directo()`; con variables distintas por tabla, `statis_bloques()`) | Los mismos individuos en todas las ocasiones | Interestructura, pesos, matriz RV, compromiso de individuos, círculo de correlaciones, inercia, trayectorias |
+| **STATIS DUAL** (`statis_dual()`) | Las mismas variables; los individuos pueden cambiar | Los mismos, con el compromiso de variables |
+| **STATIS Neutrosófico** (`statis_neutro()`) y **DUAL Neutrosófico** (`statis_dual_neutro()`) | Ternas T, I, F (columnas `_T`, `_I`, `_F`) o respuestas recodificadas | Los anteriores sobre la puntuación S = wT·T + wI·(1−I) + wF·(1−F), más indeterminación y comparación con T solo |
+
 ### Cómo se comprobaron Co-inercia, STATICO y CoSTATIS
 
 Cada resultado se comparó de tres formas: con `ade4` (las funciones de sus autores), con

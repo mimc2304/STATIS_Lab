@@ -14,6 +14,8 @@ REF <- list(
   simier1999 = "Simier, M., Blanc, L., Pellegrin, F. y Nandris, D. (1999). Approche simultanée de K couples de tableaux: application à l'étude des relations pathologie végétale-environnement. <i>Revue de Statistique Appliquée, 47</i>, 31-46.",
   thioulouse2004 = "Thioulouse, J., Simier, M. y Chessel, D. (2004). Simultaneous analysis of a sequence of paired ecological tables. <i>Ecology, 85</i>(1), 272-283. https://doi.org/10.1890/02-0605",
   bustos2026 = "Bustos-Chiliquinga, G. V., Galindo-Villardón, P., Vicente-Galindo, P. y Cornejo Gaete, C. (2026). Modeling financial structural dynamics under uncertainty: a neutrosophic-score dual STATIS approach for cooperative financial systems. <i>Mathematics, 14</i>, 3278.",
+  escoufier1973 = "Escoufier, Y. (1973). Le traitement des variables vectorielles. <i>Biometrics, 29</i>(4), 751-760. https://doi.org/10.2307/2529140",
+  lhermier1976 = "L'Hermier des Plantes, H. (1976). <i>Structuration des tableaux à trois indices de la statistique: théorie et application d'une méthode d'analyse conjointe</i> (Tesis doctoral). Université de Montpellier II.",
   lavit1988 = "Lavit, C. (1988). <i>Analyse conjointe de tableaux quantitatifs</i>. Masson.",
   lavit1994 = "Lavit, C., Escoufier, Y., Sabatier, R. y Traissac, P. (1994). The ACT (STATIS method). <i>Computational Statistics & Data Analysis, 18</i>(1), 97-119. https://doi.org/10.1016/0167-9473(94)90134-1",
   peres2001 = "Peres-Neto, P. R. y Jackson, D. A. (2001). How well do multivariate data sets match? The advantages of a Procrustean superimposition approach over the Mantel test. <i>Oecologia, 129</i>(2), 169-178. https://doi.org/10.1007/s004420100720",
@@ -195,5 +197,132 @@ TEORIA_KTABLAS <- list(
       "Validado con <code>ade4::statis(ktab.within(withinpca(...)))</code> en los ríos del Doubs (<code>jv73</code>, 65,29 / 14,38 / 8,36 % con la estandarización total), con ternas T = dato, I = 0, F = 1 − T (da el STATIS DUAL clásico) y con el cálculo algebraico directo del RV, el compromiso y el baricentro, en <code>tests/testthat/test-statis-dual-neutro.R</code>."),
     referencias = list(
       modulo = c(REF$abdi2012, REF$bustos2026),
-      original = c(REF$lavit1988, REF$lavit1994, REF$robert1976, REF$smarandache2014, REF$peres2001)))
+      original = c(REF$lavit1988, REF$lavit1994, REF$robert1976, REF$smarandache2014, REF$peres2001))),
+
+  # ---------------------------------------------------------------- STATIS ----
+  statis = list(
+    titulo = "STATIS",
+    subtitulo = "Estructuración de tablas de tres vías: los mismos individuos en K ocasiones (Escoufier, 1973; Lavit et al., 1994)",
+    resumen = list(
+      para_que = "Encontrar la configuración común de los individuos a lo largo de varias ocasiones, y ver qué ocasiones se parecen, cuáles pesan más y cómo se mueve cada individuo respecto a esa configuración común.",
+      entrada = "Formato largo: una fila por individuo y ocasión, con una columna de ocasión y otra de individuos. Los mismos individuos en todas las ocasiones; las variables pueden coincidir o no (con bloques de columnas, <code>statis_bloques()</code>).",
+      no_usar = "Individuos que cambian de una ocasión a otra (usar STATIS DUAL), una sola ocasión (usar un ACP o un HJ-Biplot) o datos faltantes.",
+      lectura = "Interestructura: ocasiones con flechas cercanas tienen configuraciones parecidas. Compromiso: individuos cercanos se parecen en el conjunto de las ocasiones; el círculo dice qué variables definen cada eje. Trayectorias: cómo se mueve cada individuo de una ocasión a otra."),
+    para_que = c(
+      "El STATIS compara K tablas que describen a <b>los mismos individuos</b> en K ocasiones (años, estaciones, evaluadores, condiciones). En lugar de comparar las tablas variable por variable, compara la <b>configuración de los individuos</b> de cada ocasión (la matriz de productos escalares entre individuos) y construye con ellas un compromiso: la configuración que mejor resume a todas.",
+      "Responde a tres preguntas: <b>¿se parecen las ocasiones?</b> (interestructura), <b>¿cómo es la configuración común?</b> (compromiso) y <b>¿cómo se aparta cada ocasión de ella?</b> (intraestructura, trayectorias). Cada tabla puede tener sus propias variables, siempre que los individuos sean los mismos."),
+    entrada = c(
+      "Hoja en formato largo: una fila por individuo y ocasión, con una columna que indique la ocasión y otra con el nombre del individuo.",
+      "Los mismos individuos en todas las ocasiones; el aplicativo los ordena igual en cada una. Si faltan individuos en alguna ocasión, avisa cuáles.",
+      "Variables numéricas, sin datos faltantes; al menos 2 variables, 3 individuos y 2 ocasiones.",
+      "Con la estandarización parcial, ninguna variable puede ser constante dentro de una ocasión (si lo es, elige «centrar» o la estandarización total)."),
+    no_usar = c(
+      "Individuos distintos en cada ocasión: la matriz n × n de cada ocasión no es comparable. Usa STATIS DUAL, que compara las variables.",
+      "Una sola ocasión: no hay tercera vía.",
+      "Variables que no son numéricas: las columnas de agrupación no entran como variables."),
+    calculos = c(
+      "<b>1. Preparación.</b> Cada tabla \\(X_k\\) (\\(n\\times p_k\\)) se centra y se escala según la opción elegida (parcial: media y desviación de cada ocasión; total: una sola desviación para todas; centrar; ninguna; o las versiones globales).",
+      "<b>2. Operadores entre individuos.</b> \\[ W_k = X_k Q_k X_k^{\\top}\\qquad (n\\times n), \\] con \\(D\\) los pesos de los individuos (\\(1/n\\)) y \\(Q_k\\) los de las variables. Cada operador \\(W_kD\\) se normaliza para que \\(\\operatorname{tr}\\big((W_kD)^2\\big)=1\\).",
+      paste("<b>3. Interestructura.</b>", FORMULAS_PTA[1]),
+      "<b>4. Pesos y compromiso.</b> Los pesos \\(\\alpha_k\\) son el primer vector propio de la matriz RV, de norma 1 (las tablas muestran también los pesos normalizados a suma 1). El compromiso es \\[ W_{+}=\\sum_k\\alpha_k\\,W_k, \\] y su descomposición espectral \\(W_{+}D\\,v_d=\\lambda_d v_d\\) da las coordenadas de los individuos \\(G=V\\Lambda^{1/2}\\). La calidad de la ocasión \\(k\\) es su \\(\\cos^2\\) con el compromiso.",
+      "<b>5. Calidad y contribución.</b> Calidad del individuo \\(i\\) en el eje \\(d\\): \\(g_{id}^2/(W_{+})_{ii}\\); contribución: \\(d_i\\,g_{id}^2/\\lambda_d\\). Ambas en por mil.",
+      "<b>6. Intraestructura.</b> Los individuos de cada ocasión se proyectan sobre el compromiso: \\(F_k=s\\,W_kD\\,G\\,\\Lambda^{-1}\\) con \\(s=\\sum_k\\alpha_k\\); su media ponderada por \\(\\alpha_k/s\\) es exactamente \\(G\\) (la app lo comprueba en cada cálculo). Las variables de cada ocasión se proyectan como su correlación con los ejes del compromiso: el <b>círculo de correlaciones</b>."),
+    lectura = c(
+      "<b>Interestructura</b>: cada ocasión es una flecha. Ángulo pequeño: configuraciones de individuos parecidas (RV alto). Una ocasión apartada tiene otra estructura.",
+      "<b>Pesos y cos²</b>: las ocasiones con más peso construyen el compromiso; con cos² bajo, el compromiso no las describe bien.",
+      "<b>Matriz RV</b>: el mismo contenido de la interestructura, par por par: celdas oscuras = ocasiones parecidas.",
+      "<b>Compromiso: individuos</b>: individuos cercanos se parecen en el conjunto de las ocasiones. Interpreta las distancias solo en los bien representados (calidad ≥ 500 ‰).",
+      "<b>Círculo de correlaciones</b>: una variable con flecha larga apunta hacia los individuos donde toma valores altos. Ángulo pequeño entre dos flechas: relación directa; 180°: inversa; 90°: sin relación.",
+      "<b>Trayectorias</b>: un recorrido corto es un individuo estable; uno largo, un individuo que cambia mucho respecto al patrón común. También se pueden ver las variables de cada ocasión.",
+      "<b>Inercia</b>: los primeros ejes con la mayor parte de la inercia son los que se interpretan.",
+      "El signo de los ejes es arbitrario: voltear el gráfico no cambia ninguna conclusión."),
+    donde = c(
+      "<code>R/ktabla.R</code>: <code>ktabla_larga()</code> y <code>ordenar_individuos_comunes()</code> arman la K-tabla y comprueban que los individuos coincidan.",
+      "<code>R/calculo_statis.R</code>: <code>statis_directo()</code>, <code>statis_bloques()</code> (tablas con variables distintas), <code>statis_neutro()</code> y la lectura guiada. Motor: <code>ktab.list.dudi()</code> y <code>statis()</code> de ade4.",
+      "<code>R/grafico_statis.R</code> (individuos, inercia, matriz RV y las descripciones de cada gráfico) y <code>R/grafico_ktabla.R</code> (interestructura, pesos, círculo, trayectorias). La pantalla está en <code>R/mod_statis_familia.R</code>.",
+      "Validado con <code>ade4::statis()</code> (valores propios y coordenadas del compromiso iguales hasta la precisión de la máquina, base <code>meau</code>), con el cálculo algebraico directo del RV y del compromiso y con el baricentro de las trayectorias, en <code>tests/testthat/test-statis.R</code>."),
+    referencias = list(
+      modulo = c(REF$abdi2012, REF$lavit1994),
+      original = c(REF$escoufier1973, REF$lhermier1976, REF$robert1976, REF$dray2007))),
+
+  # ----------------------------------------------------------- STATIS DUAL ----
+  statis_dual = list(
+    titulo = "STATIS DUAL",
+    subtitulo = "Estructuración de tablas de tres vías con las mismas variables en K ocasiones (Lavit, 1988)",
+    resumen = list(
+      para_que = "Encontrar la estructura común de relaciones entre variables a lo largo de varias ocasiones, y ver qué ocasiones se apartan de ella y cómo cambia cada variable.",
+      entrada = "Formato largo con una columna de ocasión. Las mismas variables en todas las ocasiones; los individuos pueden coincidir o no.",
+      no_usar = "Variables distintas en cada ocasión (usar STATIS con bloques) o una sola ocasión.",
+      lectura = "Interestructura: ocasiones con flechas cercanas tienen relaciones entre variables parecidas. Círculo: variables bien representadas con ángulo pequeño se relacionan directamente en el conjunto de las ocasiones. Trayectorias: cómo se ve cada variable desde cada ocasión."),
+    para_que = c(
+      "El STATIS DUAL compara K tablas que tienen <b>las mismas variables</b> medidas sobre individuos que pueden ser otros en cada ocasión. En lugar de comparar individuos, compara las <b>matrices de relaciones entre variables</b> de cada ocasión (correlaciones o covarianzas) y busca su estructura común.",
+      "Responde a tres preguntas: <b>¿se mantienen las relaciones entre variables a lo largo de las ocasiones?</b> (interestructura), <b>¿cuál es la estructura común?</b> (compromiso y círculo de correlaciones) y <b>¿qué variables y ocasiones se desvían de ella?</b> (trayectorias). Es el equivalente, en variables, del STATIS."),
+    entrada = c(
+      "Hoja en formato largo: una fila por individuo y ocasión, con una columna que indique la ocasión.",
+      "Las mismas variables numéricas en todas las ocasiones; los individuos pueden coincidir o no.",
+      "Al menos 2 ocasiones y 3 individuos por ocasión, sin datos faltantes.",
+      "Con la estandarización parcial, ninguna variable puede ser constante dentro de una ocasión."),
+    no_usar = c(
+      "Variables que cambian entre ocasiones: las matrices p × p no serían comparables.",
+      "Una sola ocasión: no hay tercera vía.",
+      "Pocas variables (menos de 3): el círculo de correlaciones dice muy poco."),
+    calculos = c(
+      "<b>1. Preparación y matrices entre variables.</b> Cada ocasión se prepara (por defecto, estandarización parcial) y da \\[ W_k = X_k^{\\top} D_k X_k \\qquad (p\\times p), \\] con \\(D_k\\) los pesos de sus individuos. Con la parcial, \\(W_k\\) es la matriz de correlaciones de la ocasión.",
+      paste("<b>2. Interestructura.</b>", FORMULAS_PTA[1]),
+      "<b>3. Compromiso.</b> \\(W_{+}=\\sum_k\\alpha_k\\,W_k/\\lVert W_k\\rVert=U\\Lambda U^{\\top}\\). Las coordenadas de las variables son \\(G=U\\Lambda^{1/2}\\); para el <b>círculo de correlaciones</b> cada variable se lleva a longitud total 1.",
+      "<b>4. Calidad y contribución.</b> Calidad de la variable \\(j\\) en el eje \\(d\\): \\(g_{jd}^2/(W_{+})_{jj}\\), sobre la inercia total de la variable; contribución: \\(g_{jd}^2/\\lambda_d\\). Ambas en por mil.",
+      "<b>5. Trayectorias.</b> Las variables vistas desde cada ocasión, \\(P_k=s\\,W_kU\\Lambda^{-1/2}\\), tienen como baricentro (pesos que suman 1) al compromiso; la app lo comprueba en cada cálculo. Los individuos de cada ocasión se proyectan como suplementarios."),
+    lectura = c(
+      "<b>Interestructura</b>, <b>pesos y cos²</b> y <b>matriz RV</b>: dicen si las relaciones entre variables son parecidas en todas las ocasiones y cuáles se apartan.",
+      "<b>Círculo de correlaciones</b>: solo se interpretan los ángulos entre flechas que llegan cerca del círculo (calidad alta). Ángulo pequeño: relación directa; cerca de 180°: inversa; cerca de 90°: sin relación lineal.",
+      "<b>Trayectorias</b>: una variable cuyas posiciones cambian mucho de una ocasión a otra no mantiene sus relaciones con las demás.",
+      "<b>Inercia</b>: cuántos ejes conservar.",
+      "El signo de los ejes es arbitrario: voltear el gráfico no cambia ninguna conclusión."),
+    donde = c(
+      "<code>R/calculo_statis_dual_neutro.R</code>: <code>statis_dual()</code>, el motor <code>motor_statis_dual()</code> (<code>withinpca()</code>, <code>ktab.within()</code> y <code>statis()</code> de ade4) y la lectura guiada.",
+      "<code>R/grafico_ktabla.R</code> y <code>R/grafico_statis.R</code>: los gráficos y sus descripciones. La pantalla está en <code>R/mod_statis_familia.R</code>.",
+      "Validado con <code>ade4::statis(ktab.within(withinpca(...)))</code> en los ríos del Doubs (<code>jv73</code>, 65,29 / 14,38 / 8,36 % con la estandarización total) y con el cálculo algebraico directo, en <code>tests/testthat/test-statis-dual-neutro.R</code>."),
+    referencias = list(
+      modulo = c(REF$abdi2012),
+      original = c(REF$lavit1988, REF$lavit1994, REF$robert1976, REF$dray2007))),
+
+  # ----------------------------------------------------- STATIS Neutrosófico ----
+  statis_neutro = list(
+    titulo = "STATIS Neutrosófico",
+    subtitulo = "STATIS sobre puntuaciones neutrosóficas (Lavit et al., 1994; Bustos-Chiliquinga et al., 2026)",
+    resumen = list(
+      para_que = "Encontrar la configuración común de los individuos a lo largo de varias ocasiones cuando cada dato es una terna neutrosófica (verdad, indeterminación, falsedad), y ver qué cambia al incluir la indeterminación.",
+      entrada = "Formato largo con una columna de ocasión y otra de individuos. Los mismos individuos en todas las ocasiones; para cada variable, columnas _T, _I y _F (o respuestas que se recodifican).",
+      no_usar = "Individuos que cambian entre ocasiones (usar DUAL Neutrosófico), una sola ocasión, o ternas construidas con datos de otras ocasiones (por ejemplo, una volatilidad que usa el año anterior y el siguiente).",
+      lectura = "Se lee como el STATIS, pero sobre las puntuaciones S. Además, el mapa de indeterminación muestra dónde la información es más incierta y la comparación con T solo, cuánto cambian I y F el resultado."),
+    para_que = c(
+      "En la lógica neutrosófica de Smarandache cada dato es una terna \\((T, I, F)\\): grados de verdad, indeterminación y falsedad entre 0 y 1, que no tienen por qué sumar 1. Como el STATIS no está definido para ternas, cada una se resume en una <b>puntuación</b> y el STATIS se aplica a la K-tabla de puntuaciones.",
+      "Se obtiene así la configuración común de los individuos teniendo en cuenta la incertidumbre de los datos. Para saber si la indeterminación importa, se compara con el STATIS de la verdad sola (T)."),
+    entrada = c(
+      "Hoja en formato largo: una fila por individuo y ocasión, con una columna de ocasión y otra de individuos.",
+      "Para cada variable, tres columnas <code>nombre_T</code>, <code>nombre_I</code> y <code>nombre_F</code> con valores entre 0 y 1; o preguntas de encuesta que se recodifican a T, I y F con una regla justificada.",
+      "Los mismos individuos en todas las ocasiones; al menos 2 ocasiones y 3 individuos.",
+      "Con la estandarización parcial, ninguna puntuación puede ser constante dentro de una ocasión."),
+    no_usar = c(
+      "Individuos distintos en cada ocasión: usar el DUAL Neutrosófico.",
+      "Ternas en las que T, I o F de una ocasión se calcularon con datos de otras ocasiones: las tablas dejan de ser independientes y el RV entre ocasiones vecinas sube de forma artificial.",
+      "Indeterminación que en realidad es un dato faltante: un faltante no equivale a I = 1; esas filas se excluyen."),
+    calculos = c(
+      "<b>1. Puntuación.</b> \\[ S_{ijk}=w_T\\,T_{ijk}+w_I\\,(1-I_{ijk})+w_F\\,(1-F_{ijk}),\\qquad w_T+w_I+w_F=1. \\] Al centrar cada ocasión, \\(S\\) equivale a \\(w_T T - w_I I - w_F F\\); con pesos iguales es la puntuación \\(T-I-F\\) del HJ neutrosófico.",
+      "<b>2. STATIS.</b> Sobre las tablas \\(S_k\\) se aplica el STATIS: operadores \\(W_k\\) entre individuos, interestructura, pesos, compromiso e intraestructura, como en el STATIS clásico.",
+      "<b>3. Indeterminación media.</b> Promedio de \\(I\\) por variable y ocasión, para ver dónde la información es más incierta.",
+      "<b>4. Comparación con T solo.</b> Se repite el STATIS con la verdad sola. La correlación entre las matrices RV, la de Spearman entre los pesos y la correlación de Procrustes entre las configuraciones de individuos (Peres-Neto y Jackson, 2001) miden cuánto cambian I y F el resultado: valores cercanos a 1, poco.",
+      "<b>5. Avisos.</b> Si \\(F = 1-T\\) en todos los datos, la falsedad no aporta información propia y solo importa la razón entre los pesos de T y de 1 − I; si \\(I = 0\\), no hay indeterminación."),
+    lectura = c(
+      "<b>Interestructura, pesos, matriz RV, compromiso, círculo y trayectorias</b>: se leen como en el STATIS, pero los datos son las puntuaciones S, no los valores originales.",
+      "<b>Indeterminación</b>: el mapa muestra en qué variables y ocasiones la información es más incierta. La indeterminación entra en la puntuación, pero no hace que una observación pese menos.",
+      "<b>Comparación con T solo</b> (pestaña Tablas): valores cercanos a 1 indican que la indeterminación y la falsedad cambian poco la estructura; valores bajos, que la modifican de forma importante.",
+      "El signo de los ejes es arbitrario: voltear el gráfico no cambia ninguna conclusión."),
+    donde = c(
+      "<code>R/calculo_statis_dual_neutro.R</code>: <code>puntuacion_neutrosofica()</code> y <code>ternas_ktabla()</code> (leen las ternas como el HJ neutrosófico).",
+      "<code>R/calculo_statis.R</code>: <code>statis_neutro()</code>, el motor <code>motor_statis()</code> y la lectura guiada.",
+      "Validado con ternas T = dato, I = 0 y F = 1 − T, que dan el STATIS clásico, y con el cálculo algebraico de la puntuación, en <code>tests/testthat/test-statis.R</code>."),
+    referencias = list(
+      modulo = c(REF$abdi2012, REF$bustos2026),
+      original = c(REF$lavit1994, REF$robert1976, REF$smarandache2014, REF$peres2001)))
 )
