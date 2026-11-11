@@ -418,6 +418,8 @@ calcular_composicional <- function(datos, variables = NULL, tipo = c("HJ", "GH",
 #' @param orden_links orden de selección de los enlaces cuando se limitan con `max_links`:
 #'   `"cortos"` (por defecto, enlaces más cortos / menor varianza, relaciones más fuertes)
 #'   o `"largos"` (enlaces más largos / mayor varianza, mayor independencia relativa).
+#' @param tipo_linea_links tipo de linea para los enlaces: `"dashed"`, `"dotted"`,
+#'    `"solid"`, `"dotdash"` (por defecto `"dashed"`)
 #' @param mostrar_rayos lógico: si `TRUE`, dibuja los vectores desde el origen.
 #' @param color_links color de las líneas de enlace (por defecto `COLOR_SUAVE`).
 #' @return objeto `ggplot` con el biplot composicional y atributo `"aspecto"`.
@@ -438,6 +440,7 @@ grafico_composicional <- function(res,
                                   resto = c("atenuar", "ocultar"),
                                   mostrar_links = TRUE, enlaces_a_mostrar = "todos",
                                   max_links = 15, orden_links = c("cortos", "largos"),
+                                  tipo_linea_links = "dashed",
                                   mostrar_rayos = TRUE,
                                   color_links = COLOR_SUAVE) {
   mostrar <- match.arg(mostrar)
@@ -549,7 +552,7 @@ grafico_composicional <- function(res,
           p <- p + ggplot2::geom_segment(
             data = df_seg,
             ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend),
-            colour = color_links, linetype = "dashed", linewidth = 0.5, alpha = 0.8
+            colour = color_links, linetype = tipo_linea_links, linewidth = 0.5, alpha = 0.8
           )
         }
       }

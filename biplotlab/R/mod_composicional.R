@@ -86,6 +86,48 @@ mod_composicional_opciones_ui <- function(id) {
     ),
     
     seccion_opciones(
+      "Pintar solo algunos puntos",
+      shiny::p(class = "bl-help",
+               "Sirve para ver una parte de los datos. Solo cambia el dibujo: el análisis no se recalcula y el encuadre no se mueve, para poder comparar varios gráficos."),
+      shiny::selectInput(ns("destacar_por"), "Elegir por", c("Individuos uno a uno" = "")),
+      shiny::selectizeInput(ns("destacar"), "Qué se pinta", choices = NULL, multiple = TRUE,
+                            options = list(plugins = list("remove_button"), placeholder = "Todos")),
+      shiny::radioButtons(ns("destacar_resto"), "Los demás puntos",
+                          c("Atenuar (gris, sin nombre)" = "atenuar", "Ocultar" = "ocultar"), inline = TRUE),
+      abierta = FALSE
+    ),
+    
+    seccion_opciones(
+      "Colores y estilo de líneas",
+      shiny::uiOutput(ns("colores_grupos_ui")),
+      colourpicker::colourInput(ns("color_vectores"), "Vectores (variables)", COLOR_VECTOR),
+      shiny::fluidRow(
+        shiny::column(6, colourpicker::colourInput(ns("color_links"), "Color de enlaces", COLOR_SUAVE)),
+        shiny::column(6, shiny::selectInput(
+          ns("tipo_linea_links"), "Tipo de raya (enlaces)",
+          c("A trazos (dashed)" = "dashed",
+            "Punteada (dotted)" = "dotted",
+            "Continua (solid)" = "solid",
+            "Punto y raya (dotdash)" = "dotdash",
+            "Raya larga (longdash)" = "longdash"),
+          selected = "dashed"
+        ))
+      ),
+      shiny::p(class = "bl-help", "Bloques de variables: los vectores de cada bloque toman su color."),
+      lapply(seq_len(N_BLOQUES), function(b) {
+        shiny::fluidRow(
+          shiny::column(8, shiny::selectizeInput(
+            ns(paste0("bloque_", b)), paste("Bloque", b), choices = NULL, multiple = TRUE,
+            options = list(plugins = list("remove_button"), placeholder = "Variables"))),
+          shiny::column(4, colourpicker::colourInput(
+            ns(paste0("bloque_col_", b)), "Color", PALETA_GRUPOS[b + 1]))
+        )
+      }),
+      shiny::actionLink(ns("restablecer"), "Restablecer colores"),
+      abierta = FALSE
+    ),
+    
+    seccion_opciones(
       "Gráfico",
       shiny::fluidRow(
         shiny::column(6, shiny::selectInput(ns("eje_x"), "Eje horizontal", 1:3, selected = 1)),
@@ -275,11 +317,117 @@ mod_composicional_server <- function(id, datos, compartido = NULL) {
       if (inherits(res, "error")) caja_error(conditionMessage(res))
     })
     
+    # Variable de grupo
+    grupos <- shiny::reactive({
+      g <- input$grupo
+      df <- datos_filtrados()
+      if (is.null(g) || !nzchar(g) || is.null(df) || !g %in% names(df)) return(NULL)
+      df[[g]]
+    })
+    
+    # --- Pintar solo algunos puntos ---------------------------------------------
+    shiny::observeEvent(datos(), {
+      noms <- intersect(datos()$nominales %||% character(), names(datos()$df))
+      shiny::updateSelectInput(session, "destacar_por",
+                               choices = c("Individuos uno a uno" = "", noms), selected = "")
+    }, ignoreNULL = TRUE)
+    
+    shiny::observeEvent(list(input$destacar_por, datos_filtrados()), {
+      df <- datos_filtrados()
+      if (is.null(df)) return()
+      por <- input$destacar_por %||% ""
+      niv <- if (nzchar(por) && por %in% names(df)) as.character(df[[por]]) else rownames(df)
+      niv <- if (is.numeric(df[[por]] %||% NA)) unique(niv[order(df[[por]])]) else sort(unique(niv))
+      shiny::updateSelectizeInput(session, "destacar", choices = niv,
+                                  selected = intersect(shiny::isolate(input$destacar), niv))
+    }, ignoreNULL = TRUE)
+    
+    destacados <- shiny::reactive({
+      if (!length(input$destacar)) return(NULL)
+      df <- datos_filtrados()
+      if (is.null(df)) return(NULL)
+      por <- input$destacar_por %||% ""
+      if (nzchar(por) && por %in% names(df)) as.character(df[[por]]) %in% input$destacar
+      else rownames(df) %in% input$destacar
+    })
+    
+    grupos_dibujo <- shiny::reactive({
+      g <- grupos()
+      por <- input$destacar_por %||% ""
+      df <- datos_filtrados()
+      if (is.null(g) && !is.null(destacados()) && nzchar(por) && !is.null(df) && por %in% names(df)) {
+        df[[por]]
+      } else {
+        g
+      }
+    })
+    
+    niveles_grupo <- shiny::reactive({
+      g <- grupos_dibujo()
+      if (is.null(g)) return(character())
+      g <- as.character(g); g[is.na(g) | g == ""] <- "(sin dato)"
+      sort(unique(g))
+    })
+    
+    # --- Colores --------------------------------------------------------------
+    output$colores_grupos_ui <- shiny::renderUI({
+      niv <- niveles_grupo()
+      if (!length(niv)) {
+        return(colourpicker::colourInput(session$ns("color_filas"), "Individuos", COLOR_FILAS))
+      }
+      pal <- colores_por_defecto(niv)
+      shiny::tagList(
+        shiny::tags$label(class = "form-label", paste("Grupos:", input$grupo %||% input$destacar_por)),
+        lapply(seq_along(niv)[seq_len(min(length(niv), 15))], function(i) {
+          colourpicker::colourInput(session$ns(paste0("col_g_", i)), niv[i], pal[[i]])
+        })
+      )
+    })
+    
+    colores_grupos <- shiny::reactive({
+      niv <- niveles_grupo()
+      if (!length(niv)) return(NULL)
+      pal <- colores_por_defecto(niv)
+      for (i in seq_len(min(length(niv), 15))) {
+        v <- input[[paste0("col_g_", i)]]
+        if (!is.null(v) && nzchar(v)) pal[[i]] <- v
+      }
+      pal
+    })
+    
+    colores_variables <- shiny::reactive({
+      out <- character()
+      for (b in seq_len(N_BLOQUES)) {
+        v <- input[[paste0("bloque_", b)]]
+        if (length(v)) out[v] <- input[[paste0("bloque_col_", b)]] %||% PALETA_GRUPOS[b + 1]
+      }
+      out
+    })
+    
+    shiny::observeEvent(datos(), {
+      vars <- names(datos()$df)
+      for (b in seq_len(N_BLOQUES)) {
+        shiny::updateSelectizeInput(session, paste0("bloque_", b), choices = vars)
+      }
+    })
+    
+    shiny::observeEvent(input$restablecer, {
+      colourpicker::updateColourInput(session, "color_vectores", value = COLOR_VECTOR)
+      colourpicker::updateColourInput(session, "color_filas", value = COLOR_FILAS)
+      colourpicker::updateColourInput(session, "color_links", value = COLOR_SUAVE)
+      shiny::updateSelectInput(session, "tipo_linea_links", selected = "dashed")
+      pal <- colores_por_defecto(niveles_grupo())
+      for (i in seq_along(pal)) colourpicker::updateColourInput(session, paste0("col_g_", i), value = pal[[i]])
+      for (b in seq_len(N_BLOQUES)) {
+        colourpicker::updateColourInput(session, paste0("bloque_col_", b), value = PALETA_GRUPOS[b + 1])
+      }
+    })
+    
     # Gráfico reactivo
     grafico_r <- shiny::reactive({
       res <- calc_ok()
       df <- datos_filtrados()
-      grp <- if (nzchar(input$grupo %||% "") && input$grupo %in% names(df)) df[[input$grupo]] else NULL
+      grp <- grupos_dibujo()
       ejes <- c(as.integer(input$eje_x %||% 1), as.integer(input$eje_y %||% 2))
       
       grafico_composicional(
@@ -290,10 +438,18 @@ mod_composicional_server <- function(id, datos, compartido = NULL) {
         enlaces_a_mostrar = "todos",
         max_links = input$max_links %||% 15,
         orden_links = input$orden_links %||% "cortos",
+        tipo_linea_links = input$tipo_linea_links %||% "dashed",
         mostrar_rayos = isTRUE(input$mostrar_rayos),
         mostrar = input$mostrar %||% "ambos",
         escala_vectores = input$escala %||% 1,
         invertir = c(isTRUE(input$voltear_h), isTRUE(input$voltear_v)),
+        colores_grupos = colores_grupos(),
+        color_filas = input$color_filas %||% COLOR_FILAS,
+        color_vectores = input$color_vectores %||% COLOR_VECTOR,
+        colores_variables = colores_variables(),
+        color_links = input$color_links %||% COLOR_SUAVE,
+        destacados = destacados(),
+        resto = input$destacar_resto %||% "atenuar",
         etiquetas_filas = isTRUE(input$etiquetas_f),
         etiquetas_columnas = isTRUE(input$etiquetas_c),
         tam_texto = input$tam_texto %||% 3.2,
@@ -303,11 +459,6 @@ mod_composicional_server <- function(id, datos, compartido = NULL) {
     })
     
     output$grafico <- render_biplot(grafico_r, session, salida = "grafico")
-    
-    output$grafico_din <- plotly::renderPlotly({
-      p <- grafico_r()
-      plotly::ggplotly(sin_repel(p))
-    })
     
     # Descargas del gráfico
     output$bajar_png <- descarga_biplot(grafico_r, function() "biplot_composicional.png", "png", dpi = 300)
