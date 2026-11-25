@@ -27,21 +27,16 @@ registro_analisis <- function() {
     analisis_cenet(),
     analisis_neutrosofico(),  # HJ-Biplot neutrosófico
     analisis_gge(),           # GGE-Biplot
-
+    
     # K-tablas. La plantilla está en inst/plantilla/mod_plantilla_ktabla.R
     # El orden sigue el número de tablas: dos, K y pares de K. Evelyn: Co-inercia, STATICO
     # y CoSTATIS; los neutrosóficos los trabaja todo el grupo
     analisis_coinercia(),
     proximamente("coinercia_neutro", "Co-inercia Neutrosófica", "circle-half-stroke",
                  "Co-inercia con datos neutrosóficos", "K-tablas", subgrupo = "Dos tablas"),
-    proximamente("statis", "STATIS", "table-cells",
-                 "Mismos individuos en todas las ocasiones (obligatorio); las variables pueden coincidir o no",
-                 "K-tablas", subgrupo = "K tablas"),                       # Isa y Evelyn
-    proximamente("statis_dual", "STATIS DUAL", "table-columns",
-                 "Mismas variables en todas las ocasiones (obligatorio); los individuos pueden coincidir o no",
-                 "K-tablas", subgrupo = "K tablas"),
-    proximamente("statis_neutro", "STATIS Neutrosófico", "circle-half-stroke",
-                 "STATIS con datos neutrosóficos", "K-tablas", subgrupo = "K tablas"),
+    analisis_statis(),                                                     # Isa y Evelyn
+    analisis_statis_dual(),
+    analisis_statis_neutro(),
     analisis_statis_dual_neutro(),
     proximamente("statis_canonico", "STATIS Canónico", "table-cells",
                  "STATIS canónico", "K-tablas", subgrupo = "K tablas"),    # Marlon
@@ -52,8 +47,9 @@ registro_analisis <- function() {
     # Se ve como un Biplot y como un método de tres vías: va en las dos pestañas
     proximamente("hj_dinamico", "HJ Dinámico", "chart-line",
                  "HJ-Biplot dinámico", "K-tablas", tambien_en = "Biplot", subgrupo = "K tablas"),
-    proximamente("hj_composicional", "HJ Composicional", "chart-pie",
-                 "HJ-Biplot composicional"),
+    #proximamente("hj_composicional", "HJ Composicional", "chart-pie",
+    #             "HJ-Biplot composicional"),
+    analisis_composicional(),
     analisis_statico(),
     proximamente("statico_neutro", "STATICO Neutrosófico", "circle-half-stroke",
                  "STATICO con datos neutrosóficos", "K-tablas", subgrupo = "Pares de K tablas"),
