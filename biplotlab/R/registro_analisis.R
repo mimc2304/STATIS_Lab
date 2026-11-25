@@ -27,7 +27,7 @@ registro_analisis <- function() {
     analisis_cenet(),
     analisis_neutrosofico(),  # HJ-Biplot neutrosófico
     analisis_gge(),           # GGE-Biplot
-
+    
     # K-tablas. La plantilla está en inst/plantilla/mod_plantilla_ktabla.R
     # El orden sigue el número de tablas: dos, K y pares de K. Evelyn: Co-inercia, STATICO
     # y CoSTATIS; los neutrosóficos los trabaja todo el grupo
@@ -47,8 +47,9 @@ registro_analisis <- function() {
     # Se ve como un Biplot y como un método de tres vías: va en las dos pestañas
     proximamente("hj_dinamico", "HJ Dinámico", "chart-line",
                  "HJ-Biplot dinámico", "K-tablas", tambien_en = "Biplot", subgrupo = "K tablas"),
-    proximamente("hj_composicional", "HJ Composicional", "chart-pie",
-                 "HJ-Biplot composicional"),
+    #proximamente("hj_composicional", "HJ Composicional", "chart-pie",
+    #             "HJ-Biplot composicional"),
+    analisis_composicional(),
     analisis_statico(),
     proximamente("statico_neutro", "STATICO Neutrosófico", "circle-half-stroke",
                  "STATICO con datos neutrosóficos", "K-tablas", subgrupo = "Pares de K tablas"),
