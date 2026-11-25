@@ -49,7 +49,7 @@ cada archivo y cómo agregar tu método.
 |---|---|---|
 | **Biplot** | HJ-Biplot, Bootstrap HJ, Clúster HJ, Canónico / MANOVA, Logístico, DPCA, Disjoint, Cenet, HJ Neutrosófico, GGE | HJ Dinámico, HJ Composicional |
 | **K-tablas: dos tablas** | Co-inercia | Co-inercia Neutrosófica |
-| **K-tablas: K tablas** | | STATIS, STATIS DUAL, sus versiones Neutrosóficas y Canónicas, Metabiplot, HJ Dinámico |
+| **K-tablas: K tablas** | DUAL Neutrosófico | STATIS, STATIS DUAL, STATIS Neutrosófico, las versiones Canónicas, Metabiplot, HJ Dinámico |
 | **K-tablas: Pares de K tablas** | STATICO, CoSTATIS | STATICO y CoSTATIS Neutrosóficos |
 
 **HJ Dinámico** aparece en los dos apartados porque es a la vez un Biplot y un método de
@@ -74,10 +74,17 @@ las guías de las prácticas del módulo y con un cálculo algebraico directo, s
 | STATICO | Fitoplancton (práctica) | λ1 = 56,928; pesos 0,261 / 0,530 / 0,598 / 0,542 |
 | CoSTATIS | Fitoplancton (práctica) | λ1 = 24,296; RV = 0,5375 |
 | CoSTATIS | Meaudret (Thioulouse, 2011) | RV = 0,8205 |
+| STATIS DUAL / DUAL Neutrosófico | Ríos del Doubs (`jv73`) | Igual a `ade4::statis()`: 65,29 / 14,38 / 8,36 % (estandarización total) |
 
 Las pruebas están en `tests/testthat/test-validacion-modulo4.R`. La de fitoplancton de la
 práctica se omite si no están sus datos, que no se publican aquí. **CoSTATIS sigue a
 Thioulouse (2011):** Co-inercia de los compromisos de dos PTA.
+
+**DUAL Neutrosófico:** cada terna (T, I, F) se resume con S = wT·T + wI·(1 − I) + wF·(1 − F)
+y se aplica el STATIS DUAL de `ade4` a la K-tabla de puntuaciones. Con T = dato, I = 0 y
+F = 1 − T da exactamente el STATIS DUAL clásico. Las pruebas están en
+`tests/testthat/test-statis-dual-neutro.R`, y la revisión del script de Bustos-Chiliquinga et
+al. (2026), en `verificacion_neutrosofico/REVISION_DUAL_NEUTROSOFICO.md` (fuera del paquete).
 
 ---
 
@@ -252,6 +259,7 @@ Cada método está separado en **dos archivos**:
 | Biplot canónico / MANOVA (uno y dos factores, bootstrap) | `calculo_canonico.R`, `grafico_canonico.R` y `tablas_canonico.R` | `mod_canonico.R` |
 | Biplot logístico, DPCA, Disjoint Biplot y CenetBiplot (app del compañero) | `equipo_logistico_externo.R`, `equipo_logistico_interno.R`, `equipo_dpca.R`, `equipo_cdpca.R`, `equipo_cenet.R`, `equipo_nucleo.R` y `equipo_graficos.R` (sin cambios) | `mod_equipo.R` |
 | HJ-Biplot neutrosófico | `neutrosofico_calculo.R` (sin cambios) | `mod_neutrosofico.R` |
+| DUAL Neutrosófico (y `statis_dual()`, el STATIS DUAL clásico, sin pantalla todavía) | `calculo_statis_dual_neutro.R` | `mod_statis_dual_neutro.R` |
 | GGE-Biplot (10 herramientas: quién ganó dónde, media vs estabilidad, rankings…) | `calculo_gge.R` y `tablas_gge.R` | `mod_gge.R` |
 
 El resto de archivos de `R/` son comunes a toda la app. **No hace falta
@@ -424,6 +432,7 @@ parte:
 | `test-encuadre.R` | Que el plano es rectangular con las ecuaciones de encuadre de la Dra. (ancho/alto = Δx/Δy, misma escala en los dos ejes). |
 | `test-equipo.R` | Propiedades de DPCA (cargas disjuntas y ortonormales), CDBiplot, Cenet y el logístico externo (coeficientes iguales a `glm`), el volteo y que todas las pestañas Teoría estén completas (tabla resumen y los dos grupos de referencias). |
 | `test-neutrosofico.R` | Las pruebas del módulo neutrosófico (matriz de resultado conocido, entradas inválidas) y la obtención de ternas desde respuestas o columnas _T, _I, _F. |
+| `test-statis-dual-neutro.R` | Que el STATIS DUAL da lo mismo que `ade4::statis()` con los ríos del Doubs y que el cálculo algebraico directo (RV, compromiso, círculo, calidad y baricentro); que con F = 1 − T solo importa la razón entre los pesos; la recodificación de respuestas, la pantalla, BGL, la lectura y la sintaxis. |
 | `test-gge.R` | Que el GGE-Biplot da lo mismo que la práctica de Ontario y que `metan::gge()` (si está instalado), las 10 herramientas, el plano 4:3 y el volteo. |
 | `test-canonico.R` | Que el Biplot canónico da lo mismo que `stats::manova()` y `MASS::lda()` con Iris, que las elipses están en la escala de W y que el diseño de dos factores (césped de Seber) coincide con `summary.manova`. |
 

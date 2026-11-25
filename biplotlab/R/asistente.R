@@ -235,7 +235,12 @@ asistente_metodos <- function(df, nominales = character(), ocasion = "", individ
   reglas$statis_canonico <- reglas$statis
   reglas$statis_dual_canonico <- reglas$statis_dual
   reglas$statis_neutro <- reglas$statis
-  reglas$statis_dual_neutro <- reglas$statis_dual
+  reglas$statis_dual_neutro <- if (!p$hay_ocasion) list("No sirve", "Necesita una columna de ocasión.")
+    else if (length(p$niveles) < 2) list("No sirve", "Necesita al menos 2 ocasiones.")
+    else if (any(p$por_ocasion < 3)) list("No sirve", "Cada ocasión necesita al menos 3 filas.")
+    else if (length(ternas) >= 2) list("Sirve", "Hay variables con columnas _T, _I y _F y una columna de ocasión.")
+    else if (length(respuestas) >= 2) list("Con condiciones", "Sirve si estas columnas son respuestas de encuesta que se puedan recodificar a T, I y F.")
+    else list("No sirve", "Necesita columnas _T, _I y _F, o al menos 2 preguntas de encuesta, y una columna de ocasión.")
   reglas$coinercia_neutro <- reglas$coinercia
   reglas$statico_neutro <- reglas$statico
   reglas$costatis_neutro <- reglas$costatis

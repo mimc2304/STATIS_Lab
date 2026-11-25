@@ -11,7 +11,7 @@ BGL_Create(x, metodo = NULL, ...)
 data.frame con los datos.}
 
 \item{metodo}{si `x` son datos, nombre de la función que los analiza:
-`"coinercia"`, `"statico"` o `"costatis"`.}
+`"coinercia"`, `"statico"`, `"costatis"`, `"statis_dual"` o `"statis_dual_neutro"`.}
 
 \item{...}{argumentos para esa función.}
 }
